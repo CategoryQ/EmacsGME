@@ -1,0 +1,13 @@
+#+TITLE: EmacsGME Readme
+
+* EmacsGME
+
+** Introduction
+
+EmacsGME is a gamesmaster emulator in the style of MythicGME/CRGE/etc, produced in emacs-lisp for playing solo-roleplaying games entirely within org-mode documents.
+
+As this is my first real use of emacs-lisp, a lot of it is just me trying out different things in a literate-programming style, with my exploratory document eventually due to tangle into an emacs-lisp file for easy addition into any emacs-setup.
+
+** Licensing
+
+This is licensed under the GPLv2, see included licence file for details.
