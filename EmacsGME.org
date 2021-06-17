@@ -47,7 +47,7 @@ The below regexp is used to check if the variable contains a valid dice input, b
 
 
 The dice input function egme-get-dice:-
-#+BEGIN_SRC emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes :results silent
 (defun egme-get-dice ()
   "Get the required dice-roll from user input on the minibuffer. Dice rolls to be expected in the usual [number]D[dicetype][modifier] format used by RPGs, for example '2D6' for 2 six-sided dice, or '3d8+2' for 3 eight-sided dice, with 2 added to the result. If the format is given without number (for example 'd100'), then it is assume to be a single dice being rolled.\n\nDice-type is stored in the variable egme-current-dice, set to nil if input can't be parsed into a dice roll."
 
@@ -94,19 +94,20 @@ First it will get the leading digits to see how many dice are being rolled, then
 + ~egme-current-dice-type~
 + ~egme-current-dice-modifier~
 
-Once that info has been extracted, it loops the ampount of times in the quantity, generating a random number up to the dice type, and applying the modifier.
+Once that info has been extracted, it loops the amount of times in the quantity, generating a random number up to the dice type, and applying the modifier.
 
 The final result is stored as ~egme-roll-result~ - this is reset to 0 each time this function is called, in the case of error there will be a zero output rather than the results from a previous roll.
 
-#+BEGIN_SRC emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes :results silent
 (defun egme-calculate-dice ()
-  "Calculates the current dice roll, as stored in the variable egme-current-dice."
+  "Calculates the current dice roll, as stored in the variable egme-current-dice, saving the result in the variable egme-roll-result for further usage. In the case a dice result isn't calculated correctly for  some reason, it will return 'nil'.\n\nThis breaks down the current dice into the following variables for calculating:-\n +egme-current-dice-quantity\n +egme-current-dice-type\n +egme-current-dice-modifier\n\nThis function loops for the quantity of dice, summing up random numbers for the appropriate type, then applying the modifier. In the case of a multiple D6 type (ie D66/D666/D6666...) then instead of summing the results it treats each roll as a differnet digit in the final number."
 
   ; Reset last roll result
   (setq egme-roll-result 0)
+  (setq egme-multi-6-temp nil)
   
   ; Get quantity of dice rolled
-  (string-match "^[0-9]+" egme-current-dice)
+  (string-match "^[1-9]+" egme-current-dice)
   (setq egme-current-dice-quantity (string-to-number (match-string 0 egme-current-dice)))
 
   ; Get current dice type
@@ -121,17 +122,32 @@ The final result is stored as ~egme-roll-result~ - this is reset to 0 each time 
     (setq egme-current-dice-modifier 0)
   )
 
-  ; Loop the amount of dice, generating a random number for each
-  (dotimes (n egme-current-dice-quantity)
-    (setq egme-roll-result (+ egme-roll-result (+ 1 (random egme-current-dice-type))))
+  ; Check if dice type is a D66/D666/D6666 etc
+  (if (string-match "^66+$" (number-to-string egme-current-dice-type))
+    ; If a multi-6 dice, roll each D6 and combine as string, then repeat for each quantity of rolls
+    (dotimes (n egme-current-dice-quantity)
+      (dotimes (n (length (number-to-string egme-current-dice-type)))
+        (setq egme-multi-6-temp (concat egme-multi-6-temp (number-to-string (+ 1 (random 6)))))
+      )
+      (setq egme-roll-result (string-to-number egme-multi-6-temp))
+    )
+
+    ;Else calculate dice as usual
+    ; Loop the amount of dice, generating a random number for each
+    (dotimes (n egme-current-dice-quantity)
+      (setq egme-roll-result (+ egme-roll-result (+ 1 (random egme-current-dice-type))))
+    )
   )
   ; Add the modifier to the result, for the final roll
   (setq egme-roll-result (+ egme-roll-result egme-current-dice-modifier))
+
+  ; If the roll-result is a zero, something has gone wrong so change that to "nil"
+  (if (equal 0 egme-roll-result)
+    (setq egme-roll-result nil)
+  )
 )
 #+END_SRC
 
-#+RESULTS:
-: egme-calculate-dice
 
 Output test:-
 
@@ -145,7 +161,7 @@ egme-roll-result
 #+END_SRC
 
 #+RESULTS:
-: 41
+: 53
 
 
 ** TODO Yes/No Oracle
