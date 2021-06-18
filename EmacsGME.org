@@ -49,7 +49,7 @@ The below regexp is used to check if the variable contains a valid dice input, b
 The dice input function egme-get-dice:-
 #+BEGIN_SRC emacs-lisp :tangle yes :results silent
 (defun egme-get-dice ()
-  "Get the required dice-roll from user input on the minibuffer. Dice rolls to be expected in the usual [number]D[dicetype][modifier] format used by RPGs, for example '2D6' for 2 six-sided dice, or '3d8+2' for 3 eight-sided dice, with 2 added to the result. If the format is given without number (for example 'd100'), then it is assume to be a single dice being rolled.\n\nDice-type is stored in the variable egme-current-dice, set to nil if input can't be parsed into a dice roll."
+  "Get the required dice-roll from user input on the minibuffer. Dice rolls to be expected in the usual [number]D[dicetype][modifier] format used by RPGs, for example '2D6' for 2 six-sided dice, or '3d8+2' for 3 eight-sided dice, with 2 added to the result. If the format is given without number (for example 'd100'), then it is assume to be a single dice being rolled.\n\nReturns the dice-type, which is also stored in the variable egme-current-dice - returns nil if input can't be parsed into a dice roll."
 
   ; Get user input
   (setq egme-current-dice (read-string "Enter dice roll:" egme-current-dice))
@@ -66,26 +66,24 @@ The dice input function egme-get-dice:-
     ; ***Else*** set it to nil
     (setq egme-current-dice nil)
   )
+
+  egme-current-dice
 )
 #+END_SRC
-
-#+RESULTS:
-: egme-get-dice
-
 
 The selected dice can later be returned by evaluating it's name.
 
 #+BEGIN_SRC emacs-lisp :tangle no
 (egme-get-dice)
-egme-current-dice
 #+END_SRC
 
 #+RESULTS:
-: 2d6+2
+: 1d20
 
 In the case that a dice-roll cannot be parsed, the output will be ~nil~ so it can be easily read in control functions later.
 
-*** TODO Calculating dice roll
+*** DONE Calculating dice roll
+CLOSED: [2021-06-18 Fri 00:18]
 
 Below is how the dice roll is deconstructed.
 
@@ -94,13 +92,13 @@ First it will get the leading digits to see how many dice are being rolled, then
 + ~egme-current-dice-type~
 + ~egme-current-dice-modifier~
 
-Once that info has been extracted, it loops the amount of times in the quantity, generating a random number up to the dice type, and applying the modifier.
+Once that info has been extracted, it loops the amount of times in the quantity, generating a random number up to the dice type and summing, then applying the modifier. In the case of a multiple D6 type (ie D66/D666/D6666...) then instead of summing the results it treats each roll as a differnet digit in the final number.
 
 The final result is stored as ~egme-roll-result~ - this is reset to 0 each time this function is called, in the case of error there will be a zero output rather than the results from a previous roll.
 
 #+BEGIN_SRC emacs-lisp :tangle yes :results silent
 (defun egme-calculate-dice ()
-  "Calculates the current dice roll, as stored in the variable egme-current-dice, saving the result in the variable egme-roll-result for further usage. In the case a dice result isn't calculated correctly for  some reason, it will return 'nil'.\n\nThis breaks down the current dice into the following variables for calculating:-\n +egme-current-dice-quantity\n +egme-current-dice-type\n +egme-current-dice-modifier\n\nThis function loops for the quantity of dice, summing up random numbers for the appropriate type, then applying the modifier. In the case of a multiple D6 type (ie D66/D666/D6666...) then instead of summing the results it treats each roll as a differnet digit in the final number."
+  "Calculates the current dice roll, as stored in the variable egme-current-dice, saving the result in the variable egme-roll-result for further usage.\n\nThis breaks down the current dice into the following variables for calculating:-\n +egme-current-dice-quantity\n +egme-current-dice-type\n +egme-current-dice-modifier\n\nThis function loops for the quantity of dice, summing up random numbers for the appropriate type, then applying the modifier. In the case of a multiple D6 type (ie D66/D666/D6666...) then instead of summing the results it treats each roll as a differnet digit in the final number.\n\nReturns the result of the roll."
 
   ; Reset last roll result
   (setq egme-roll-result 0)
@@ -141,10 +139,7 @@ The final result is stored as ~egme-roll-result~ - this is reset to 0 each time 
   ; Add the modifier to the result, for the final roll
   (setq egme-roll-result (+ egme-roll-result egme-current-dice-modifier))
 
-  ; If the roll-result is a zero, something has gone wrong so change that to "nil"
-  (if (equal 0 egme-roll-result)
-    (setq egme-roll-result nil)
-  )
+  egme-roll-result
 )
 #+END_SRC
 
@@ -157,12 +152,35 @@ Output test:-
 ;egme-current-dice-quantity
 ;egme-current-dice-type
 ;egme-current-dice-modifier
-egme-roll-result
 #+END_SRC
 
 #+RESULTS:
-: 53
+: 9
 
+*** TODO User dice roll function (with output)
+
+This function is how the user is expected to interact with the dice roller (typically via a keybind). It will call the egme-get-dice command, followed by the egme-calculate-dice command, and then output the info in a human-readable format - with a smattering of error-checking along the way.
+
+#+BEGIN_SRC emacs-lisp :tangle yes :results silent
+(defun egme-roll-dice ()
+  "Lets roll some dice init"
+  ; Let user call via M-x
+  (interactive)
+
+  ; Get dice size from user
+  (egme-get-dice)
+
+  ; Check dice input was correct
+  (if egme-current-dice
+    ; If valid then calculate result
+    (egme-calculate-dice)
+    ; Else drop an error message and exit
+    (user-error "Could not parse dice roll")
+  )
+
+  egme-roll-result
+)
+#+END_SRC
 
 ** TODO Yes/No Oracle
 
