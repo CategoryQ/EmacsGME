@@ -116,6 +116,7 @@ For dice rolls, we will get user input from the mini-buffer using ~read-string~.
 The below regexp is used to check if the variable contains a valid dice input, but if there is no leading number then one is inserted.
 [1-9][0-9]?[dD][1-9][0-9]*\\([+-][0-9]+\\)?
 
+A history of dice rolls requested is stored in the variable ~egme-dice-history~, and if no user input at-all is given then the last input is repeated.
 
 The dice input function egme-get-dice:-
 #+BEGIN_SRC emacs-lisp :tangle yes :results silent
@@ -123,7 +124,7 @@ The dice input function egme-get-dice:-
   "Get the required dice-roll from user input on the mini-buffer. Dice rolls to be expected in the usual [number]D[dice-type][modifier] format used by RPGs, for example '2D6' for 2 six-sided dice, or '3d8+2' for 3 eight-sided dice, with 2 added to the result. If the format is given without number (for example 'd100'), then it is assume to be a single dice being rolled.\n\nIf no input is given, then it will return the last dice rolled. A full history of rolls is stored in 'egme-dice-history', accessible via the arrow keys when asked for input.\n\nReturns the dice-type, which is also stored in the variable egme-current-dice - returns nil if input can't be parsed into a dice roll."
 
   ; Get user input
-  (setq egme-current-dice (read-string "Enter dice roll: " nil 'egme-dice-history (car egme-dice-history)))
+  (setq egme-current-dice (read-string (format "Enter dice roll (default %s): " (car egme-dice-history)) nil 'egme-dice-history (car egme-dice-history)))
 
   ; Add a leading "1" in case user inputs without type (i.e just "D100")
   (if (string-match "^[dD]" egme-current-dice)
