@@ -6,7 +6,6 @@
 
 The basic idea is to define some functions within Emacs lisp, to facilitate solo role-playing. Then you'll be able to M-x or assign key-binds to quickly roll dice, or get Yes/No oracle results from the GM emulator, fed straight into the document where you are logging your game play. A generic dice roller will be needed (to facilitate any RPG system). As for the GM emulator, I'll need to design a basic system (where outcome likelihood can change), along with a subject/meaning look up table, a way of managing lists of threads/NPCs, and random events popping up.
 
-Initially just some useful functions, possibly to become a minor-mode all of it's own?
 
 * Variables
 
@@ -32,6 +31,25 @@ The below sets a list to be used for the dice roll function's history
 (setq egme-dice-history (list))
 #+END_SRC
 
+** Probability List
+
+The below list is used for selecting probabilities when asking yes/no questions
+
+#+BEGIN_SRC emacs-lisp :tangle yes :results silent
+; Standard probability list for ido-completing-read
+(setq egme-probability-list (list
+  "0  Even odds"
+  "-1  Unlikely"
+  "-2  Very Unlikely"
+  "-3  Extremely Unlikely"
+  "-4  Near Impossible"
+  "+4  Near Certain"
+  "+3  Extremely Likely"
+  "+2  Very Likely"
+  "+1  Likely")
+)
+#+END_SRC
+
 
 * Functions
 
@@ -46,7 +64,14 @@ Jump to the end of the line, add 2 newlines, add the eGME start, then the functi
 
 #+BEGIN_SRC emacs-lisp :tangle yes :results silent
 (defun egme-print-output (print-string)
-  "This function takes a string in as an argument, and prints it's output into the current buffer, between lines highlighting it as games-master output.\n\nFor normal text files, the visual braces are stored as the following strings:-\n\n  egme-print-start-line\n  egme-print-end-line\n\n\If the current buffer is an org-mode document, the output is placed inside a quote block so it can retain the bonuses of export fomatting."
+  "This function takes a string in as an argument, and prints it's output into the current buffer, between lines highlighting it as games-master output.
+
+For normal text files, the visual braces are stored as the following strings:-
+
+  egme-print-start-line
+  egme-print-end-line
+
+If the current buffer is an org-mode document, the output is placed inside a quote block so it can retain the bonuses of export fomatting."
 
   ; Move point to "safe" position
   (end-of-line)
@@ -94,7 +119,7 @@ The core of this is obviously the ~random~ function.  The below example shows a 
 #+END_SRC
 
 #+RESULTS:
-: 6
+: 1
 
 ~random~ will produce a result up to the given limit, using addition here to add to it (as D6 doesn't have a ~0~ side, D10 would not need that addition for example). Passing the value ~t~ or a string will reseed the pseudo random number generator. Setting a textual seed at the start of each game play file is a good idea, so if it ever gets recalculated the results will be consistent (in the same version of emacs, at least).
 
@@ -120,27 +145,31 @@ A history of dice rolls requested is stored in the variable ~egme-dice-history~,
 
 The dice input function egme-get-dice:-
 #+BEGIN_SRC emacs-lisp :tangle yes :results silent
-(defun egme-get-dice ()
-  "Get the required dice-roll from user input on the mini-buffer. Dice rolls to be expected in the usual [number]D[dice-type][modifier] format used by RPGs, for example '2D6' for 2 six-sided dice, or '3d8+2' for 3 eight-sided dice, with 2 added to the result. If the format is given without number (for example 'd100'), then it is assume to be a single dice being rolled.\n\nIf no input is given, then it will return the last dice rolled. A full history of rolls is stored in 'egme-dice-history', accessible via the arrow keys when asked for input.\n\nReturns the dice-type, which is also stored in the variable egme-current-dice - returns nil if input can't be parsed into a dice roll."
+  (defun egme-get-dice ()
+    "Get the required dice-roll from user input on the mini-buffer. Dice rolls to be expected in the usual [number]D[dice-type][modifier] format used by RPGs, for example '2D6' for 2 six-sided dice, or '3d8+2' for 3 eight-sided dice, with 2 added to the result. If the format is given without number (for example 'd100'), then it is assume to be a single dice being rolled.
 
-  ; Get user input
-  (setq egme-current-dice (read-string (format "Enter dice roll (default %s): " (car egme-dice-history)) nil 'egme-dice-history (car egme-dice-history)))
+If no input is given, then it will return the last dice rolled. A full history of rolls is stored in 'egme-dice-history', accessible via the arrow keys when asked for input.
 
-  ; Add a leading "1" in case user inputs without type (i.e just "D100")
-  (if (string-match "^[dD]" egme-current-dice)
-    (setq egme-current-dice (concat "1" egme-current-dice))
+Returns the dice-type, which is also stored in the variable egme-current-dice - returns nil if input can't be parsed into a dice roll."
+    
+    ; Get user input
+    (setq egme-current-dice (read-string (format "Enter dice roll (default %s): " (car egme-dice-history)) nil 'egme-dice-history (car egme-dice-history)))
+  
+    ; Add a leading "1" in case user inputs without type (i.e just "D100")
+    (if (string-match "^[dD]" egme-current-dice)
+        (setq egme-current-dice (concat "1" egme-current-dice))
+      )
+  
+    ; Look for string in dice-roll format
+    (if (string-match "[1-9][0-9]?[dD][1-9][0-9]*\\([+-][0-9]+\\)?" egme-current-dice)
+        ; ***If*** regex matches, set egme-current-dice to the current roll
+        (setq egme-current-dice (match-string 0 egme-current-dice))
+      ; ***Else*** set it to nil
+      (setq egme-current-dice nil)
+      )
+  
+    egme-current-dice
   )
-
-  ; Look for string in dice-roll format
-  (if (string-match "[1-9][0-9]?[dD][1-9][0-9]*\\([+-][0-9]+\\)?" egme-current-dice)
-    ; ***If*** regex matches, set egme-current-dice to the current roll
-    (setq egme-current-dice (match-string 0 egme-current-dice))
-    ; ***Else*** set it to nil
-    (setq egme-current-dice nil)
-  )
-
-  egme-current-dice
-)
 #+END_SRC
 
 The selected dice can later be returned by evaluating it's name.
@@ -150,7 +179,7 @@ The selected dice can later be returned by evaluating it's name.
 #+END_SRC
 
 #+RESULTS:
-: 1d20
+: 2d6
 
 In the case that a dice-roll cannot be parsed, the output will be ~nil~ so it can be easily read in control functions later.
 
@@ -170,7 +199,16 @@ The final result is stored as ~egme-roll-result~ - this is reset to 0 each time 
 
 #+BEGIN_SRC emacs-lisp :tangle yes :results silent
 (defun egme-calculate-dice ()
-  "Calculates the current dice roll, as stored in the variable egme-current-dice, saving the result in the variable egme-roll-result for further usage.\n\nThis breaks down the current dice into the following variables for calculating:-\n +egme-current-dice-quantity\n +egme-current-dice-type\n +egme-current-dice-modifier\n\nThis function loops for the quantity of dice, summing up random numbers for the appropriate type, then applying the modifier. In the case of a multiple D6 type (ie D66/D666/D6666...) then instead of summing the results it treats each roll as a different digit in the final number.\n\nReturns the result of the roll."
+  "Calculates the current dice roll, as stored in the variable egme-current-dice, saving the result in the variable egme-roll-result for further usage.
+
+This breaks down the current dice into the following variables for calculating:-
+ +egme-current-dice-quantity
+ +egme-current-dice-type
+ +egme-current-dice-modifier
+
+This function loops for the quantity of dice, summing up random numbers for the appropriate type, then applying the modifier. In the case of a multiple D6 type (ie D66/D666/D6666...) then instead of summing the results it treats each roll as a different digit in the final number.
+
+Returns the result of the roll."
 
   ; Reset last roll result
   (setq egme-roll-result 0)
@@ -227,7 +265,7 @@ Output test:-
 #+END_SRC
 
 #+RESULTS:
-: 9
+: 4
 
 *** DONE User dice roll function (with output)
 CLOSED: [2021-06-19 Sat 00:38]
@@ -259,6 +297,86 @@ This function is how the user is expected to interact with the dice roller (typi
 
 
 ** TODO Yes/No Oracle
+
+For the oracle, there is a list of different options for the probabilty of a success (likely/even odds/unlikely/etc..) which the user selects interactively. This is seleceted via the function ~ido-completing-read~, using the left & right keys.
+
+For the Oracle, you roll ~1D10~ - on a 6+ the answer is "Yes", on a 5 or less the answer is "No" - this dice roll is modified based on the following probabilities:-
+- Near Certain (+4)
+- Extremely Likely (+3)
+- Very Likely (+2)
+- Likely (+1)
+- 50/50 (0)
+- Unlikely (-1)
+- Very Unlikely (-2)
+- Extremely Unlikely (-3)
+- Near Impossible (-4)
+
+This result can be transformed further. ~1D8~ is rolled alongside this, and on a roll of 1 the result is appened with ", but..", on a roll of 2 it's appended with ", and..." - anything else is ignored. These modifiers are to be interpreted as a partial result ("but" implies some hinderance to the answer) or an extreme result ("and" implies the answer goes beyond what is expected) respectively.
+
+#+BEGIN_SRC emacs-lisp :tangle yes :results silent
+  (defun egme-y-n-oracle ()
+    "The basic oracle function. WRITE MOAR TEXT HERE, PLEASE."
+    (interactive)
+
+    ; Reset some variables
+    (setq egme-oracle-ouput nil)
+    (setq egme-oracle-answer nil)
+    (setq egme-current-question nil)
+    
+    ; Get the user to input a question
+    (setq egme-current-question (read-string "What is the question?: "))
+
+    ; Get probability from the user
+    (setq egme-current-probability-choice (ido-completing-read "Probability modifier: " egme-probability-list))
+
+    (string-match "[+\-]?[0-9]" egme-current-probability-choice)
+    (setq egme-current-probability-modifier (match-string 0 egme-current-probability-choice))
+    
+    ; Roll dice, apply modifier
+    (setq egme-current-dice "1d10")
+    (setq egme-oracle-answer-roll (+ (egme-calculate-dice) (string-to-number egme-current-probability-modifier)))
+    (setq egme-current-dice "1d6")
+    (setq egme-oracle-answer-modifier (egme-calculate-dice))
+
+    ; Convert dice rolls into result text
+    ; Check if modified oracle roll is 6+ ('Yes')
+    (if (>= egme-oracle-answer-roll 6)
+      ; If greater, then answer yes
+      (setq egme-oracle-answer "Yes")
+      ; Else answer no
+      (setq egme-oracle-answer "No")
+    )
+
+    ; Apply answer modifier (if applicable)
+    (if (eq egme-oracle-answer-modifier 1)
+      ; Add 'but' if rolled 1
+      (setq egme-oracle-answer (concat (format "%s" egme-oracle-answer) ", but..."))
+
+      ; Else check if result is 2 and add 'and'
+      (if (eq egme-oracle-answer-modifier 2)
+        (setq egme-oracle-answer (concat (format "%s" egme-oracle-answer) ", and..."))
+      )
+    )
+
+
+    ;; Prepare output for printing
+    ; Check if a question was input...
+    (if egme-current-question
+      ; ..then add quesiton to the output with results
+      (setq egme-oracle-output (concat (format "   Question:  %s\n" egme-current-question)))
+    )
+
+    ; Get probability text
+    (string-match "[A-Za-z][A-Za-z ]*" egme-current-probability-choice)
+    (setq egme-probability-text (match-string 0 egme-current-probability-choice))
+
+    ; Output probability and results
+    (setq egme-oracle-output (concat egme-oracle-output (format "Probability:  %s\n" egme-probability-text) (format "\n     Answer:  %s" egme-oracle-answer)))
+    
+    (egme-print-output egme-oracle-output)
+  )
+#+END_SRC
+
 
 ** TODO Random Events
 
