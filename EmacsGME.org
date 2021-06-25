@@ -1,6 +1,6 @@
 #+TITLE: EmacsGME
 #+DESCRIPTION: A variety of elisp functions for implementing a solo role-playing games-master emulator, for playing a full game within an org-file
-#+PROPERTY: header-args :tangle egme.el
+#+PROPERTY: header-args :tangle "egme.el"
 
 * Introduction
 
@@ -360,8 +360,10 @@ Once that info has been extracted, it loops the amount of times in the quantity,
 
 The final result is stored as ~egme-roll-result~ - this is reset to 0 each time this function is called, in the case of error there will be a zero output rather than the results from a previous roll.
 
+This can be called with a string of the dice roll - this avoids using ~egme-get-dice~ and changing the user input history.
+
 #+BEGIN_SRC emacs-lisp :tangle yes :results silent
-(defun egme-calculate-dice ()
+(defun egme-calculate-dice (&optional current-dice)
   "Calculates the current dice roll, as stored in the variable egme-current-dice, saving the result in the variable egme-roll-result for further usage.
 
 This breaks down the current dice into the following variables for calculating:-
@@ -376,6 +378,11 @@ Returns the result of the roll."
   ; Reset last roll result
   (setq egme-roll-result 0)
   (setq egme-multi-6-temp nil)
+
+  ; Set egme-current-dice if an option was passed with the function call
+  (if current-dice
+    (setq egme-current-dice current-dice)
+  )
   
   ; Get quantity of dice rolled
   (string-match "^[1-9]+" egme-current-dice)
@@ -420,15 +427,15 @@ Returns the result of the roll."
 Output test:-
 
 #+BEGIN_SRC emacs-lisp :tangle no
-(egme-get-dice)
-(egme-calculate-dice)
+;(egme-get-dice)
+(egme-calculate-dice "2d6+2")
 ;egme-current-dice-quantity
 ;egme-current-dice-type
 ;egme-current-dice-modifier
 #+END_SRC
 
 #+RESULTS:
-: 4
+: 12
 
 *** DONE User dice roll function (with output)
 CLOSED: [2021-06-19 Sat 00:38]
