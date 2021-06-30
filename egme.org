@@ -21,8 +21,7 @@ The below sets up the group for customize
 #+BEGIN_SRC emacs-lisp :tangle yes :results silent
 (defgroup egme nil
   "Variables for customizing the Emacs Games Master Emulator."
-  :group 'games
-)
+  :group 'games)
 #+END_SRC
 
 
@@ -34,14 +33,12 @@ The below variables define the "braces" around any games-master output. These ar
 (defcustom egme-print-line-start "~~|Games Master|~~~~~~~~~"
   "String printed before games master ouput in non-org buffers."
   :type 'string
-  :group 'egme
-)
+  :group 'egme)
 
 (defcustom egme-print-line-end "~~~~~~~~~~~~~~~~~~~~~~~~~"
   "String printed after games master output in non-org buffers."
   :type 'string
-  :group 'egme
-)
+  :group 'egme)
 #+END_SRC
 
 
@@ -126,8 +123,7 @@ The below action/subject lists are for random events & detailed questions. The w
   "Work")
   "List of 'Action' variables used in the random event generator."
   :type '(repeat string)
-  :group 'egme
-)
+  :group 'egme)
 #+END_SRC
 
 
@@ -208,8 +204,7 @@ The below action/subject lists are for random events & detailed questions. The w
   "Wounds")
   "List of 'Subject' variables used in the random event generator."
   :type '(repeat string)
-  :group 'egme
-)
+  :group 'egme)
 #+END_SRC
 
 
@@ -241,8 +236,7 @@ The below list is used for selecting probabilities when asking yes/no questions.
   "+4  Near Certain"
   "+3  Extremely Likely"
   "+2  Very Likely"
-  "+1  Likely")
-)
+  "+1  Likely"))
 #+END_SRC
 
 
@@ -263,8 +257,7 @@ The below intitializes the ~egme-random-counter~ as zero, and set's the possible
   "PC negative"
   "NPC positive"
   "NPC negative"
-  "Ambiguous event")
-)
+  "Ambiguous event"))
 #+END_SRC
 
 
@@ -289,10 +282,7 @@ Will return nil if list is empty."
 
   (cond
    (list-to-pick-from
-    (nth (random (length list-to-pick-from)) list-to-pick-from)
-    )
-   )
-)
+    (nth (random (length list-to-pick-from)) list-to-pick-from))))
 #+END_SRC
 
 
@@ -321,19 +311,16 @@ Returns the dice-type, which is also stored in the variable egme-current-dice - 
   
     ; Add a leading "1" in case user inputs without type (i.e just "D100")
     (if (string-match "^[dD]" egme-current-dice)
-        (setq egme-current-dice (concat "1" egme-current-dice))
-      )
+        (setq egme-current-dice (concat "1" egme-current-dice)))
   
     ; Look for string in dice-roll format
     (if (string-match "[1-9][0-9]?[dD][1-9][0-9]*\\([+-][0-9]+\\)?" egme-current-dice)
         ; ***If*** regex matches, set egme-current-dice to the current roll
         (setq egme-current-dice (match-string 0 egme-current-dice))
       ; ***Else*** set it to nil
-      (setq egme-current-dice nil)
-      )
+      (setq egme-current-dice nil))
   
-    egme-current-dice
-  )
+    egme-current-dice)
 #+END_SRC
 
 The selected dice can later be returned by evaluating it's name.
@@ -381,8 +368,7 @@ This function loops for the quantity of dice, summing up random numbers for the 
 
   ; Set egme-current-dice if an option was passed with the function call
   (if dice-roll
-    (setq egme-current-dice dice-roll)
-  )
+    (setq egme-current-dice dice-roll))
   
   ; Get quantity of dice rolled
   (string-match "^[1-9]+" egme-current-dice)
@@ -397,30 +383,24 @@ This function loops for the quantity of dice, summing up random numbers for the 
     ; If found assign as number
     (setq egme-current-dice-modifier (string-to-number (match-string 0 egme-current-dice)))
     ; If nil, set modifier to 0
-    (setq egme-current-dice-modifier 0)
-  )
+    (setq egme-current-dice-modifier 0))
   
   ; Check if dice type is a D66/D666/D6666 etc
   (if (string-match "^66+$" (number-to-string egme-current-dice-type))
     ; If a multi-6 dice, roll each D6 and combine as string, then repeat for each quantity of rolls
     (dotimes (n egme-current-dice-quantity)
       (dotimes (n (length (number-to-string egme-current-dice-type)))
-        (setq egme-multi-6-temp (concat egme-multi-6-temp (number-to-string (+ 1 (random 6)))))
-      )
-      (setq egme-roll-result (string-to-number egme-multi-6-temp))
-    )
+        (setq egme-multi-6-temp (concat egme-multi-6-temp (number-to-string (+ 1 (random 6))))))
+      (setq egme-roll-result (string-to-number egme-multi-6-temp)))
 
     ;Else calculate dice as usual
     ; Loop the amount of dice, generating a random number for each
     (dotimes (n egme-current-dice-quantity)
-      (setq egme-roll-result (+ egme-roll-result (+ 1 (random egme-current-dice-type))))
-    )
-  )
+      (setq egme-roll-result (+ egme-roll-result (+ 1 (random egme-current-dice-type))))))
   ; Add the modifier to the result, for the final roll
   (setq egme-roll-result (+ egme-roll-result egme-current-dice-modifier))
 
-  egme-roll-result
-)
+  egme-roll-result)
 #+END_SRC
 
 
@@ -466,8 +446,7 @@ If the current buffer is an org-mode document, the output is placed inside a quo
     ; If an org-file, output into a quote block
     (insert "#+BEGIN_QUOTE *Games Master*")
     ; Else output the opening brace
-    (insert egme-print-line-start)
-  )
+    (insert egme-print-line-start))
   (newline)
 
   ; Output text generated by egme functions
@@ -481,12 +460,10 @@ If the current buffer is an org-mode document, the output is placed inside a quo
     ; If an org-file, close the quote block
     (insert "#+END_QUOTE")
     ; Else output the closing brace brace
-    (insert egme-print-line-end)
-  )
+    (insert egme-print-line-end))
   
   (newline 2)
-  t
-)
+  t)
 #+END_SRC
 
 
@@ -563,13 +540,11 @@ This function is interactively callable via M-x, and a prime input option for ke
     ; If valid then calculate result
     (egme-calculate-dice)
     ; Else drop an error message and exit
-    (user-error "Could not parse dice roll")
-  )
+    (user-error "Could not parse dice roll"))
 
   ; Print results
   (egme-print-output (concat (format "Rolled:  %s" egme-current-dice) (format "\nResult:  %s" egme-roll-result)))
-  egme-roll-result
-)
+  egme-roll-result)
 #+END_SRC
 
 
