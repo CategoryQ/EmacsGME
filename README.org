@@ -35,13 +35,14 @@ This will accept any numbers for the dice type, and will roll dice with that ran
 Hit return, and the results will be printed into the current buffer like these examples:-
  
 
-* TODO
+* TO-DO List
 
 The following items are currently on the todo list, but I am open to suggestions of how this can be further expanded.
 
-- [ ] Handling a list of NPCs
-- [ ] Handling a list of threads
+- Handling a list of NPCs
+- Handling a list of threads
 
+  
 * Licensing
 
 This is licensed under the GPLv2, see included licence file for details.
