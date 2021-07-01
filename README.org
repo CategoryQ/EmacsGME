@@ -25,7 +25,7 @@ Usage should be easy to gleam by reading the ~egme.org~ - I hae tried to heavily
 
 ** Dice Roller
 
-The first main feature is the dice roller, the function ~egme-roll-dice~. This can either be called with ~M-x egme-roll-dice~, or by the default keybind of ~C-c g r~.
+The first main feature is the dice roller, the function ~egme-roll-dice~ . This can either be called with ~M-x egme-roll-dice~ , or by the default keybind of ~C-c g r~ . 
 After calling, the user is asked to input a dice roll into the mini-buffer. This is to be input as per any usual RPG dice roll, with a modifier, without spaces. Examples of valid choices are:-
 - 1d20
 - 2D6+3
