@@ -38,7 +38,8 @@ Hit return, and the results will be printed into the current buffer like these e
 Rolled:  2d12+8
 Result:  20
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-
+#+END_QUOTE
+#+BEGIN_QUOTE
 ~~|Games Master|~~~~~~~~~
 Rolled:  1d666
 Result:  646
