@@ -644,5 +644,12 @@ The function egme-random-event is also called to see if anything unexpected occu
 
 * TODO Key map/Key bindings
 
-All default keybindings are set here for the interactive functions.
+All default keybindings are set here for the interactive functions. A new map ~egme-map~ is defined and accessed via ~"C-c g"~, with all other keybinds under that. 
+
+#+BEGIN_SRC emacs-lisp :tangel yes :results silent
+(define-prefix-command 'egme-map)
+(define-key mode-specific-map (kbd "g") 'egme-map)
+(define-key egme-map (kbd "r") 'egme-roll-dice)
+(define-key egme-map (kbd "q") 'egme-y-n-oracle)
+#+END_SRC
 
