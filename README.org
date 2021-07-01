@@ -33,7 +33,7 @@ After calling, the user is asked to input a dice roll into the mini-buffer. This
 - 3d10-5
 This will accept any numbers for the dice type, and will roll dice with that range of numbers. This is only treated differently when using multiple-6 dice (D66,D666,D6666...) - in those cases, it will roll that many 6-sided dice and combine them for each digit of the result.
 Hit return, and the results will be printed into the current buffer like these examples:-
-#+BEGIN_QUOTE
+
 ~~|Games Master|~~~~~~~~~
 Rolled:  2d12+8
 Result:  20
@@ -43,7 +43,7 @@ Result:  20
 Rolled:  1d666
 Result:  646
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-#+END_QUOTE
+
 
 
 ** TODO
