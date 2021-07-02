@@ -21,11 +21,11 @@ Be sure to put in the correct path for where your copy of ~egme.el~ is saved.
 
 * Usage
 
-Usage should be easy to gleam by reading the ~egme.org~ - I hae tried to heavily document each function, not just in how it works but how I hope to extend in the future.
+Usage should be easy to gleam by reading the ~egme.org~ - I have tried to heavily document each function as I write them, not just in how it works but how I hope to extend in the future.
 
 ** Dice Roller
 
-The first main feature is the dice roller, the function ~egme-roll-dice~ . This can either be called with ~M-x egme-roll-dice~ , or by the default keybind of ~C-c g r~ . 
+The first main feature is the dice roller, the function "egme-roll-dice". This can either be called with "M-x egme-roll-dice", or by the default keybind of "C-c g r". 
 After calling, the user is asked to input a dice roll into the mini-buffer. This is to be input as per any usual RPG dice roll, with a modifier, without spaces. Examples of valid choices are:-
 - 1d20
 - 2D6+3
@@ -50,14 +50,90 @@ Result:  646
 
 This function keeps a history of rolls that have been made previoulsy - if you give it no input, then it will reroll the last dice type, or you can scroll back and forth with the up/down keys.
 
+
+** Yes/No Oracle
+
+This features is the main driver of solo-roleplaying with EmacsGME, the yes/no oracle. This function is named "egme-y-n-oracle", and can be called interactively with "M-x egme-y-n-oracle", or with the default keybind of "C-c g q".
+Once called, it will ask the user what question is being asked. Here you can type a question into the minibuffer, which will be included with any output - this is optional. It will also scan the current line, and if a question is found it will be used as the initial input.
+Once a question has been set (or given blank input) then the function asks for probability. This is a sliding scale between +4 and -4, with a description ranging from "Near Certain" to "Near Impossible" - this will affect the likelihood of getting a yes or no, for tweaking probabilities on a per-question case.. Options are chosen by typing the modifier, or scrolling between them using left & right on the keyboard. The deafult option is "0  Even Odds" - just hit enter for a question with unclear probability. An example of this output is:-
+
+#+BEGIN_QUOTE
+~~|Games Master|~~~~~~~~~
+   Question:  Is the door locked?
+Probability:  Likely
+------------
+     Answer:  Yes
+~~~~~~~~~~~~~~~~~~~~~~~~~
+#+END_QUOTE
+
+In some cases, these yes/no answers are extended with answer modifiers or random events...
+
+*** Answer Modifiers
+
+The answers are further modified - in some cases there will be an extremely response, or a partial response. All the possible responses are:-
+
+- Yes, and...
+- Yes
+- Yes, but...
+- No, but...
+- No
+- No, and...
+
+An example of that output is:-
+
+#+BEGIN_QUOTE
+~~|Games Master|~~~~~~~~~
+   Question:  Does the guard notice me?
+Probability:  Even odds
+------------
+     Answer:  Yes, and...
+~~~~~~~~~~~~~~~~~~~~~~~~~
+#+END_QUOTE
+
+An "and..." implies the answer goes beyond the basic. So "Yes, and.." is exceptionally positive, and "No, and..." is exceptionally negative.
+Getting "but..." implies a partial success/failure. So "Yes, but..." is partially positive, and "No, but..." is only partially negative.
+
+*** Random Events
+
+As time goes by, there is an ever-increasing chance of a random event occuring each time you ask a question. When a random event occurs, it is added to the output of the oracle.
+A random event consists of the focus (what/who is affected by the event), and the detail (a random Action & Subject word combined). Example of a random event occuring is:-
+
+#+BEGIN_QUOTE
+~~|Games Master|~~~~~~~~~
+   Question:  Is the machine switched on?
+Probability:  Very Unlikely
+------------
+     Answer:  No
+------------
+Random Event!
+      Focus:  NPC action
+     Detail:  Divide / Jealousy
+~~~~~~~~~~~~~~~~~~~~~~~~~
+#+END_QUOTE
+
+The player is left to interpret what these results mean in the context of their game.
+
+The Focus table is based on the random events from [[http://wordmillgames.com/mythic-game-master-emulator.html][Mythic GME]], by Word Mill games. The default Action & Subject lists come from my physical card deck, [[https://quintendo.uk/category/solo-sci-fi-sidekick/][Solo Sci-Fi Sidekick]].
+
+** Output to User
+
+All output is printed into the current buffer, braced by lines highlighting it as Games Master output. If the document that the player is playing in happens to be an org-mode document however, then the Games Master output will be placed into a quote-block. This still makes it clear that it is separate from the game text, but means it can be folded away, and will produce nicer output if using those functions from org-mode.
+
+If not using org-mode however, the "braces" around Games Master output can be modified within ~customize~ in emacs, or by changing the variables ~egme-print-line-start~ and ~egme-print-line-end~.
+
+** More Details
+
+The entire system is developed from a pen & paper system based on actual dice rolls, details of this system can be found within the ~egme.org~ file against each function.
+
 * TO-DO List
 
-The following items are currently on the todo list, but I am open to suggestions of how this can be further expanded.
+The following items are currently on the todo list - I am open to further suggestions of how this can be improved.
 
+- Saving variables between sessions
 - Handling a list of NPCs
 - Handling a list of threads
 
   
 * Licensing
 
-This is licensed under the GPLv2, see included licence file for details.
+EmacsGME is licensed under the GPLv2, see included licence file for details.
