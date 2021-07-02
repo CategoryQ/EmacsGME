@@ -125,6 +125,11 @@ If not using org-mode however, the "braces" around Games Master output can be mo
 
 The entire system is developed from a pen & paper system based on actual dice rolls, details of this system can be found within the ~egme.org~ file against each function.
 
+
+* Changelog
+
+- v0.1 - Initial release
+
 * TO-DO List
 
 The following items are currently on the todo list - I am open to further suggestions of how this can be improved.
