@@ -1,10 +1,10 @@
-;Copyright (C) 2021 Category <category@[no_spam]quintendo.uk>
-;
-;This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; version 2.
-;
-;This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-;
-;You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+;;Copyright (C) 2021 Category <category@[no_spam]quintendo.uk>
+;;
+;;This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; version 2.
+;;
+;;This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+;;
+;;You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 (defgroup egme nil
   "Variables for customizing the Emacs Games Master Emulator."
@@ -21,193 +21,193 @@
   :group 'egme)
 
 (defcustom egme-action-list '("Abandon"
-  "Abuse"
-  "Adversity"
-  "Agree"
-  "Ambush"
-  "Antagonise"
-  "Arrive"
-  "Assist"
-  "Attach"
-  "Befriend"
-  "Bestow"
-  "Betray"
-  "Block"
-  "Break"
-  "Celebrate"
-  "Change"
-  "Communicate"
-  "Control"
-  "Create"
-  "Cruelty"
-  "Deceive"
-  "Delay"
-  "Desert"
-  "Develop"
-  "Dispute"
-  "Disrupt"
-  "Divide"
-  "Dominate"
-  "Expose"
-  "Failure"
-  "Fight"
-  "Gratify"
-  "Guide"
-  "Harm"
-  "Heal"
-  "Immitate"
-  "Imprison"
-  "Inform"
-  "Inquire"
-  "Inspect"
-  "Intolerance"
-  "Judge"
-  "Kill"
-  "Malice"
-  "Mistrust"
-  "Move"
-  "Neglect"
-  "Open"
-  "Oppose"
-  "Oppress"
-  "Passion"
-  "Persecute"
-  "Praise"
-  "Procrastinate"
-  "Propose"
-  "Punish"
-  "Pursue"
-  "Release"
-  "Return"
-  "Ruin"
-  "Separate"
-  "Spy"
-  "Starting"
-  "Stop"
-  "Take"
-  "Transform"
-  "Travel"
-  "Trick"
-  "Trust"
-  "Violate"
-  "Waste"
-  "Work")
+			      "Abuse"
+			      "Adversity"
+			      "Agree"
+			      "Ambush"
+			      "Antagonise"
+			      "Arrive"
+			      "Assist"
+			      "Attach"
+			      "Befriend"
+			      "Bestow"
+			      "Betray"
+			      "Block"
+			      "Break"
+			      "Celebrate"
+			      "Change"
+			      "Communicate"
+			      "Control"
+			      "Create"
+			      "Cruelty"
+			      "Deceive"
+			      "Delay"
+			      "Desert"
+			      "Develop"
+			      "Dispute"
+			      "Disrupt"
+			      "Divide"
+			      "Dominate"
+			      "Expose"
+			      "Failure"
+			      "Fight"
+			      "Gratify"
+			      "Guide"
+			      "Harm"
+			      "Heal"
+			      "Immitate"
+			      "Imprison"
+			      "Inform"
+			      "Inquire"
+			      "Inspect"
+			      "Intolerance"
+			      "Judge"
+			      "Kill"
+			      "Malice"
+			      "Mistrust"
+			      "Move"
+			      "Neglect"
+			      "Open"
+			      "Oppose"
+			      "Oppress"
+			      "Passion"
+			      "Persecute"
+			      "Praise"
+			      "Procrastinate"
+			      "Propose"
+			      "Punish"
+			      "Pursue"
+			      "Release"
+			      "Return"
+			      "Ruin"
+			      "Separate"
+			      "Spy"
+			      "Starting"
+			      "Stop"
+			      "Take"
+			      "Transform"
+			      "Travel"
+			      "Trick"
+			      "Trust"
+			      "Violate"
+			      "Waste"
+			      "Work")
   "List of 'Action' variables used in the random event generator."
   :type '(repeat string)
   :group 'egme)
 
 (defcustom egme-subject-list '("A path"
-  "A project"
-  "Adversities"
-  "Advice"
-  "Allies"
-  "Ambush"
-  "Animals"
-  "Art"
-  "Attention"
-  "Balance"
-  "Bureaucracy"
-  "Business"
-  "Competition"
-  "Danger"
-  "Death"
-  "Dispute"
-  "Disruption"
-  "Dreams"
-  "Elements"
-  "Emotions"
-  "Energy"
-  "Environment"
-  "Expectations"
-  "Extravagance"
-  "Failure"
-  "Fame"
-  "Fears"
-  "Friendship"
-  "Goals"
-  "Home"
-  "Hope"
-  "Illness"
-  "Information"
-  "Inside"
-  "Intrigues"
-  "Jealousy"
-  "Joy"
-  "Leadership"
-  "Lies"
-  "Masses"
-  "Messages"
-  "Military"
-  "Nature"
-  "New ideas"
-  "Opposition"
-  "Outside"
-  "Pain"
-  "Peace"
-  "Plans"
-  "Pleasures"
-  "Portals"
-  "Possessions"
-  "Power"
-  "Prison"
-  "Randomness"
-  "Reality"
-  "Riches"
-  "Rumor"
-  "Stalemate"
-  "Status quo"
-  "Success"
-  "Suffering"
-  "Tactics"
-  "Technology"
-  "Travel"
-  "Trials"
-  "Vehicle"
-  "Victory"
-  "Weapons"
-  "Weather"
-  "Wishes"
-  "Wounds")
+			       "A project"
+			       "Adversities"
+			       "Advice"
+			       "Allies"
+			       "Ambush"
+			       "Animals"
+			       "Art"
+			       "Attention"
+			       "Balance"
+			       "Bureaucracy"
+			       "Business"
+			       "Competition"
+			       "Danger"
+			       "Death"
+			       "Dispute"
+			       "Disruption"
+			       "Dreams"
+			       "Elements"
+			       "Emotions"
+			       "Energy"
+			       "Environment"
+			       "Expectations"
+			       "Extravagance"
+			       "Failure"
+			       "Fame"
+			       "Fears"
+			       "Friendship"
+			       "Goals"
+			       "Home"
+			       "Hope"
+			       "Illness"
+			       "Information"
+			       "Inside"
+			       "Intrigues"
+			       "Jealousy"
+			       "Joy"
+			       "Leadership"
+			       "Lies"
+			       "Masses"
+			       "Messages"
+			       "Military"
+			       "Nature"
+			       "New ideas"
+			       "Opposition"
+			       "Outside"
+			       "Pain"
+			       "Peace"
+			       "Plans"
+			       "Pleasures"
+			       "Portals"
+			       "Possessions"
+			       "Power"
+			       "Prison"
+			       "Randomness"
+			       "Reality"
+			       "Riches"
+			       "Rumor"
+			       "Stalemate"
+			       "Status quo"
+			       "Success"
+			       "Suffering"
+			       "Tactics"
+			       "Technology"
+			       "Travel"
+			       "Trials"
+			       "Vehicle"
+			       "Victory"
+			       "Weapons"
+			       "Weather"
+			       "Wishes"
+			       "Wounds")
   "List of 'Subject' variables used in the random event generator."
   :type '(repeat string)
   :group 'egme)
 
 (setq egme-dice-history (list))
 
-; Standard probability list for ido-completing-read
+;; Standard probability list for ido-completing-read
 (setq egme-probability-list (list
-  "0  Even odds"
-  "-1  Unlikely"
-  "-2  Very Unlikely"
-  "-3  Extremely Unlikely"
-  "-4  Near Impossible"
-  "+4  Near Certain"
-  "+3  Extremely Likely"
-  "+2  Very Likely"
-  "+1  Likely"))
+			     "0  Even odds"
+			     "-1  Unlikely"
+			     "-2  Very Unlikely"
+			     "-3  Extremely Unlikely"
+			     "-4  Near Impossible"
+			     "+4  Near Certain"
+			     "+3  Extremely Likely"
+			     "+2  Very Likely"
+			     "+1  Likely"))
 
 (setq egme-random-counter 0)
 
 (setq egme-random-event-list (list
-  "Remote event"
-  "NPC action"
-  "New NPC appears"
-  "Move towards thread"
-  "Move away from thread"
-  "PC positive"
-  "PC negative"
-  "NPC positive"
-  "NPC negative"
-  "Ambiguous event"))
+			      "Remote event"
+			      "NPC action"
+			      "New NPC appears"
+			      "Move towards thread"
+			      "Move away from thread"
+			      "PC positive"
+			      "PC negative"
+			      "NPC positive"
+			      "NPC negative"
+			      "Ambiguous event"))
 
 (defun egme-random-list-item (list-to-pick-from)
   "This function takes a list as an argument, and returns a random element from within that list.
 
-Will return nil if list is empty."
+Will return nil if provided list is nil."
 
   (cond
-   (list-to-pick-from
-    (nth (random (length list-to-pick-from)) list-to-pick-from))))
+    (list-to-pick-from (nth (random (length list-to-pick-from)) list-to-pick-from))
+    (t nil)))
 
   (defun egme-get-dice ()
     "Get the required dice-roll from user input on the mini-buffer. Dice rolls to be expected in the usual [number]D[dice-type][modifier] format used by RPGs, for example '2D6' for 2 six-sided dice, or '3d8+2' for 3 eight-sided dice, with 2 added to the result. If the format is given without number (for example 'd100'), then it is assume to be a single dice being rolled.
@@ -215,72 +215,66 @@ Will return nil if list is empty."
 If no input is given, then it will return the last dice rolled. A full history of rolls is stored in 'egme-dice-history', accessible via the arrow keys when asked for input.
 
 Returns the dice-type, which is also stored in the variable egme-current-dice - returns nil if input can't be parsed into a dice roll."
-    
-    ; Get user input
-    (setq egme-current-dice (read-string (format "Enter dice roll (default %s): " (car egme-dice-history)) nil 'egme-dice-history (car egme-dice-history)))
+
+    (setq egme-current-dice (read-string (format "Enter dice roll (default %s): " (car egme-dice-history))
+					 nil
+					 'egme-dice-history
+					 (car egme-dice-history)))
   
-    ; Add a leading "1" in case user inputs without type (i.e just "D100")
-    (if (string-match "^[dD]" egme-current-dice)
-        (setq egme-current-dice (concat "1" egme-current-dice)))
+    ;; Add a leading "1" in case user inputs without type (i.e just "D100")
+    (when (string-match "^[dD]" egme-current-dice)
+      (setq egme-current-dice (concat "1" egme-current-dice)))
   
-    ; Look for string in dice-roll format
-    (if (string-match "[1-9][0-9]?[dD][1-9][0-9]*\\([+-][0-9]+\\)?" egme-current-dice)
-        ; ***If*** regex matches, set egme-current-dice to the current roll
-        (setq egme-current-dice (match-string 0 egme-current-dice))
-      ; ***Else*** set it to nil
-      (setq egme-current-dice nil))
-  
-    egme-current-dice)
+    ;; Look for string in dice-roll format, return if found
+    (when (string-match "[1-9][0-9]?[dD][1-9][0-9]*\\([+-][0-9]+\\)?" egme-current-dice)
+      (setq egme-current-dice (match-string 0 egme-current-dice))))
 
 (defun egme-calculate-dice (&optional dice-roll)
-  "Calculates the current dice roll. If called alone, it rolls the variable egme-current-dice. If the optional argument of 'dice-roll' is provided, it will roll that - it must be in RPG dice notation ('1d20', '3d10+8', '2d6-4', etc). It returns the result of the dice roll, and saves the result in the variable egme-roll-result for further usage.
+  "Calculates the current dice roll. If called alone, roll the variable egme-current-dice. If argument DICE-ROLL is provided, roll that - it must be in RPG dice notation ('1d20', '3d10+8', '2d6-4', etc). Return the result of the dice roll, and store in the variable egme-roll-result.
 
-This breaks down the current dice into the following variables for calculating:-
+Current roll is broken down into the following variable for calculating:-
  +egme-current-dice-quantity
  +egme-current-dice-type
  +egme-current-dice-modifier
 
-This function loops for the quantity of dice, summing up random numbers for the appropriate type, then applying the modifier. In the case of a multiple D6 type (ie D66/D666/D6666...) then instead of summing the results it treats each roll as a different digit in the final number."
+This function loops for the quantity of dice, summing up random numbers for the appropriate type, then applying the modifier. In the case of a multiple D6 type (ie D66/D666/D6666...) then instead of summing the results it treats each D6 roll as a different digit in the final result."
 
-  ; Reset last roll result
+  ;; Reset last roll result
   (setq egme-roll-result 0)
   (setq egme-multi-6-temp nil)
 
-  ; Set egme-current-dice if an option was passed with the function call
-  (if dice-roll
+  ;; Set egme-current-dice if an option was passed with the function call
+  (when dice-roll
     (setq egme-current-dice dice-roll))
   
-  ; Get quantity of dice rolled
+  ;; Get quantity of dice rolled
   (string-match "^[1-9]+" egme-current-dice)
+
   (setq egme-current-dice-quantity (string-to-number (match-string 0 egme-current-dice)))
 
-  ; Get current dice type
+  ;; Get current dice type
   (string-match "[dD][1-9][0-9]*" egme-current-dice)
+
   (setq egme-current-dice-type (string-to-number (string-trim-left (match-string 0 egme-current-dice) "[dD]")))
 
-  ; Get modifier (if present, else set to 0)
+  ;; Get modifier (if present, else set to 0)
   (if (string-match "[+-][0-9]+$" egme-current-dice)
-    ; If found assign as number
-    (setq egme-current-dice-modifier (string-to-number (match-string 0 egme-current-dice)))
-    ; If nil, set modifier to 0
+      (setq egme-current-dice-modifier (string-to-number (match-string 0 egme-current-dice)))
     (setq egme-current-dice-modifier 0))
   
-  ; Check if dice type is a D66/D666/D6666 etc
+  ;; Check if dice type is a D66/D666/D6666 etc
   (if (string-match "^66+$" (number-to-string egme-current-dice-type))
-    ; If a multi-6 dice, roll each D6 and combine as string, then repeat for each quantity of rolls
-    (dotimes (n egme-current-dice-quantity)
-      (dotimes (n (length (number-to-string egme-current-dice-type)))
-        (setq egme-multi-6-temp (concat egme-multi-6-temp (number-to-string (+ 1 (random 6))))))
-      (setq egme-roll-result (string-to-number egme-multi-6-temp)))
-
-    ;Else calculate dice as usual
-    ; Loop the amount of dice, generating a random number for each
+      ;; If a multi-6 dice, roll each D6 and combine as string, then repeat for each quantity of rolls
+      (dotimes (n egme-current-dice-quantity)
+	      (dotimes (n (length (number-to-string egme-current-dice-type)))
+          (setq egme-multi-6-temp (concat egme-multi-6-temp (number-to-string (+ 1 (random 6))))))
+	      (setq egme-roll-result (string-to-number egme-multi-6-temp)))
+    ;; Else calculate dice as usual
     (dotimes (n egme-current-dice-quantity)
       (setq egme-roll-result (+ egme-roll-result (+ 1 (random egme-current-dice-type))))))
-  ; Add the modifier to the result, for the final roll
-  (setq egme-roll-result (+ egme-roll-result egme-current-dice-modifier))
 
-  egme-roll-result)
+  ;; Add the modifier to the result, for the final roll
+  (setq egme-roll-result (+ egme-roll-result egme-current-dice-modifier)))
 
 (defun egme-print-output (print-string)
   "This function takes a string in as an argument, and prints it's output into the current buffer, between lines highlighting it as games-master output.
@@ -292,33 +286,40 @@ For normal text files, the visual braces are stored as the following strings:-
 
 If the current buffer is an org-mode document, the output is placed inside a quote block so it can retain the bonuses of export fomatting."
 
-  ; Move point to "safe" position
+  ;; Move point to "safe" position
   (end-of-line)
-  (newline 2)
 
-  ; Output the start line
-  ; Check if current buffer is an org-mode file
-  (if (equal (with-current-buffer (current-buffer) major-mode) 'org-mode)
-    ; If an org-file, output into a quote block
-    (insert "#+BEGIN_QUOTE *Games Master*")
-    ; Else output the opening brace
-    (insert egme-print-line-start))
+  ;; Add additional newline if current line contains is non-blank
+  (when (string-match "[:ascii:]" (thing-at-point 'line t))
+      (newline))
+
   (newline)
 
-  ; Output text generated by egme functions
+  ;;; Output the start line
+  ;; Check if current buffer is an org-mode file, and output accordingly
+  (if (equal (with-current-buffer (current-buffer) major-mode) 'org-mode)
+      ;; If an org-file, output into a quote block
+      (insert "#+BEGIN_QUOTE *Games Master*")
+    ;; Else output the opening brace
+    (insert egme-print-line-start))
+
+  (newline)
+
+  ;; Output text generated by egme functions
   (insert print-string)
 
   (newline)
 
-  ; Output the end line
-  ; Check if current buffer is an org-mode file
+  ;;;; Output the end line
+  ;; Check if current buffer is an org-mode file
   (if (equal (with-current-buffer (current-buffer) major-mode) 'org-mode)
-    ; If an org-file, close the quote block
-    (insert "#+END_QUOTE")
-    ; Else output the closing brace brace
+      ;; If an org-file, close the quote block
+      (insert "#+END_QUOTE")
+    ;; Else output the closing brace brace
     (insert egme-print-line-end))
   
   (newline 2)
+
   t)
 
   (defun egme-random-event ()
@@ -395,7 +396,7 @@ The function egme-random-event is also called to see if anything unexpected occu
     
     ; Check if the current line contains a question (ends in a question mark, and gets everything from the last ellipses to the end of the line)
     (setq egme-current-line (thing-at-point 'line t))
-    (if (string-match "\\.?[0-9A-Za-z ,:;']*\\? *$" egme-current-line)
+    (if (string-match "\\.?[0-9A-Za-z ,:;']+\\? *$" egme-current-line)
       ; If that current line is a question, strip any leading ellipses or spaces, then set as pre-filled input when asking for the current question
       (setq egme-current-question (read-string "What is the question? " (replace-regexp-in-string " *$" "" (replace-regexp-in-string "^\\.* *" "" (match-string 0 egme-current-line)))))
       ; Else just ask user for question
@@ -443,3 +444,8 @@ The function egme-random-event is also called to see if anything unexpected occu
 
     ; Send output string to display to user 
     (egme-print-output egme-oracle-output))
+
+(define-prefix-command 'egme-map)
+(define-key mode-specific-map (kbd "g") 'egme-map)
+(define-key egme-map (kbd "r") 'egme-roll-dice)
+(define-key egme-map (kbd "q") 'egme-y-n-oracle)

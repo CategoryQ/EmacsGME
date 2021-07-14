@@ -4,11 +4,13 @@
 
 EmacsGME v0.1
 
+
 * Introduction
 
 EmacsGME is a gamesmaster emulator in the style of MythicGME/CRGE/etc, produced in emacs-lisp for playing solo-roleplaying games entirely within text/org-mode documents.
 
 As this is my first real use of emacs-lisp, a lot of it is just me trying out different things in a literate-programming style, with my exploratory document eventually due to tangle into an emacs-lisp file for easy addition into any emacs-setup.
+
 
 * Installation
 
@@ -18,6 +20,7 @@ For now, the simplest way to add this to your install is to clone this repo, and
 (load-file "/path/to/egme.el")
 #+END_SRC
 Be sure to put in the correct path for where your copy of ~egme.el~ is saved.
+
 
 * Usage
 
@@ -115,6 +118,7 @@ The player is left to interpret what these results mean in the context of their 
 
 The Focus table is based on the random events from [[http://wordmillgames.com/mythic-game-master-emulator.html][Mythic GME]], by Word Mill games. The default Action & Subject lists come from my physical card deck, [[https://quintendo.uk/category/solo-sci-fi-sidekick/][Solo Sci-Fi Sidekick]].
 
+
 ** Output to User
 
 All output is printed into the current buffer, braced by lines highlighting it as Games Master output. If the document that the player is playing in happens to be an org-mode document however, then the Games Master output will be placed into a quote-block. This still makes it clear that it is separate from the game text, but means it can be folded away, and will produce nicer output if using those functions from org-mode.
@@ -130,6 +134,7 @@ The entire system is developed from a pen & paper system based on actual dice ro
 
 - v0.1 - Initial release
 
+
 * TO-DO List
 
 The following items are currently on the todo list - I am open to further suggestions of how this can be improved.
@@ -137,6 +142,7 @@ The following items are currently on the todo list - I am open to further sugges
 - Saving variables between sessions
 - Handling a list of NPCs
 - Handling a list of threads
+- Possibly implement as a minor-mode - with siderbar buffer showing game info (threads/NPCs/etc)
 
   
 * Licensing
