@@ -299,7 +299,7 @@ If the current buffer is an org-mode document, the output is placed inside a quo
   ;; Check if current buffer is an org-mode file, and output accordingly
   (if (equal (with-current-buffer (current-buffer) major-mode) 'org-mode)
       ;; If an org-file, output into a quote block
-      (insert "#+BEGIN_GamesMaster")
+      (insert "#+BEGIN_QUOTE GamesMaster")
     ;; Else output the opening brace
     (insert egme-print-line-start))
 
@@ -314,7 +314,7 @@ If the current buffer is an org-mode document, the output is placed inside a quo
   ;; Check if current buffer is an org-mode file
   (if (equal (with-current-buffer (current-buffer) major-mode) 'org-mode)
       ;; If an org-file, close the quote block
-      (insert "#+END_GamesMaster")
+      (insert "#+END_QUOTE GamesMaster")
     ;; Else output the closing brace brace
     (insert egme-print-line-end))
   
