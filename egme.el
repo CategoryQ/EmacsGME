@@ -299,7 +299,7 @@ If the current buffer is an org-mode document, the output is placed inside a quo
   ;; Check if current buffer is an org-mode file, and output accordingly
   (if (equal (with-current-buffer (current-buffer) major-mode) 'org-mode)
       ;; If an org-file, output into a quote block
-      (insert "#+BEGIN_QUOTE *Games Master*")
+      (insert "#+BEGIN_GamesMaster")
     ;; Else output the opening brace
     (insert egme-print-line-start))
 
@@ -314,7 +314,7 @@ If the current buffer is an org-mode document, the output is placed inside a quo
   ;; Check if current buffer is an org-mode file
   (if (equal (with-current-buffer (current-buffer) major-mode) 'org-mode)
       ;; If an org-file, close the quote block
-      (insert "#+END_QUOTE")
+      (insert "#+END_GamesMaster")
     ;; Else output the closing brace brace
     (insert egme-print-line-end))
   
@@ -328,33 +328,31 @@ If the current buffer is an org-mode document, the output is placed inside a quo
 When an oracle question is asked, this function is called. It keeps a counter in the variable egme-random-counter, which is incremented easch time this is called. Then a single 1d20 is rolled - if the result is lower than the current egme-random-counter value, then a random event is generated. A focus, action and subject are randomly selected from the lists (egme-random-event-list, egme-action-list, and egme-subject-list respectively). If a random event was generated, the counter is reset to 0.
 
 This function then returns the random event text, for the calling function to pass on to for user output."
-  
-    ; Increment random counter
-    (setq egme-random-counter (+ 1 egme-random-counter))
-    ; Clear random event output text
+
+    ;; Increment random counter
+    (setq egme-random-counter (1+ egme-random-counter))
+
+    ;; Clear random event output text
     (setq egme-random-event-output nil)
   
     (cond
-      ; Compare the random counter to a d20 roll
+      ;; Compare the random counter to a d20 roll
       ((< (egme-calculate-dice "1d20") egme-random-counter)
 
+       ;; Announce the event
+       (setq egme-random-event-output "\n------------\nRandom Event!")
       
-      ; If a random event should occur, evaluate the follow expressions
+        ;; Add a type of random event
+        (setq egme-random-event-output (concat egme-random-event-output (format "\n      Focus:  %s" (egme-random-list-item egme-random-event-list))))
 
-      ; Announce the event
-      (setq egme-random-event-output "\n------------\nRandom Event!")
-      
-      ; Add a type of random event
-      (setq egme-random-event-output (concat egme-random-event-output (format "\n      Focus:  %s" (egme-random-list-item egme-random-event-list))))
+	;; Add event details
+	(setq egme-random-event-output (concat egme-random-event-output (format "\n     Detail:  %s" (egme-random-list-item egme-action-list))(format " / %s" (egme-random-list-item egme-subject-list))))
 
-      ; Add event details
-      (setq egme-random-event-output (concat egme-random-event-output (format "\n     Detail:  %s" (egme-random-list-item egme-action-list))(format " / %s" (egme-random-list-item egme-subject-list))))
-      
-      ; Reset the random counter
-      (setq egme-random-counter 0)
+	;; Reset the random counter
+	(setq egme-random-counter 0)
 
-      ; Return text output
-      egme-random-event-output)))
+	;; Return text output
+	egme-random-event-output)))
 
 (defun egme-roll-dice ()
   "This function is for a user to generate the results from a dice roll, and output them into the current buffer.
