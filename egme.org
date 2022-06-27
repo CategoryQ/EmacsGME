@@ -1,5 +1,5 @@
 #+TITLE: EmacsGME
-#+DESCRIPTION: A variety of elisp functions for implementing a solo role-playing games-master emulator, for playing a full game within an org-file
+#+DESCRIPTION: A variety of elisp functions for implementing a solo role-playing games-master emulator, for playing a full game within an org-file.
 #+PROPERTY: header-args
 
 * License
