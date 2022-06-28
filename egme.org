@@ -658,7 +658,71 @@ The function egme-random-event is also called to see if anything unexpected occu
 
 ** TODO Thread List Handling
 
+
 ** TODO NPC List Handling
+
+The NPC list is stored at the end of the file, under an org header called "EmacsGME Store", and within a drawer called "NPCS" - which would look something like:-
+
+:NPCS:
+Alice
+Bob
+Chris
+Dante
+Elvira
+:END:
+
+The contents of this drawer can be easily parsed into a list when needed, and easily found through searching. The function ~save-excursion~ will be used to return the user where they were in the file.
+
+*** DONE Add NPC
+CLOSED: [2022-06-28 Tue 23:49]
+
+This function can either be passed a new character name, or it will ask for user input when a new character is required. It will search the current file backwards for the NPCS drawer, and add the new NPC to the beginning. The drawer will be created at the end of the file if not alread present.
+
+#+BEGIN_SRC emacs-lisp :tangle yes :results silent
+(defun egme-add-npc (&optional npc-name)
+  "This function adds an NPC to the current file.
+
+NPCS are stored at the end of the file, under an :NPCS: drawer. It will search backwards from the end of the file for the drawer, and create it if not found. npc-name is then inserted on at the beginning of the drawer."
+
+  (interactive)
+
+  ; Ask for NPC name if nothing is passed to the function
+  (if npc-name
+      t
+    (setq npc-name (read-string "New NPC name?")))
+
+  ; save-excursion so cursor returns to users current position
+  (save-excursion
+    (progn
+      (end-of-buffer)
+      
+      ; Search backwards for ":NPCS:" 
+      (if (search-backward ":NPCS:" nil t)
+
+	  ; The drawer has been found, check if npc-name already exists
+	  (progn
+	    (end-of-line)
+	    (newline)
+	    (insert npc-name))
+
+	; The :NPCS: drawer doesn't exist, create it and add the new npc-name
+	(insert (concat "\n:NPCS:\n" npc-name "\n:END:\n")))
+
+      ; Fold the Drawer closed
+      (search-backward ":NPCS:" nil t)
+      (org-cycle)))
+  
+  ; Return the added npc-name
+  npc-name)
+#+END_SRC
+
+*** TODO Parse NPCs to list
+
+This function will find the NPC list within the current file, and return it as a list. If an NPC list does not yet exist, it will return ~nil~ and throw a user error. 
+
+*** TODO Delete NPC
+
+This function will remove an NPC from the list - the parsed list will be provided to the user, a selection is made, and the new list is written to the file.
 
 
 * TODO Key map/Key bindings

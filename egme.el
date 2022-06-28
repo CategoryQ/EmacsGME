@@ -443,6 +443,42 @@ The function egme-random-event is also called to see if anything unexpected occu
     ; Send output string to display to user 
     (egme-print-output egme-oracle-output))
 
+(defun egme-add-npc (&optional npc-name)
+  "This function adds an NPC to the current file.
+
+NPCS are stored at the end of the file, under an :NPCS: drawer. It will search backwards from the end of the file for the drawer, and create it if not found. npc-name is then inserted on at the beginning of the drawer."
+
+  (interactive)
+
+  ; Ask for NPC name if nothing is passed to the function
+  (if npc-name
+      t
+    (setq npc-name (read-string "New NPC name?")))
+
+  ; save-excursion so cursor returns to users current position
+  (save-excursion
+    (progn
+      (end-of-buffer)
+      
+      ; Search backwards for ":NPCS:" 
+      (if (search-backward ":NPCS:" nil t)
+
+	  ; The drawer has been found, check if npc-name already exists
+	  (progn
+	    (end-of-line)
+	    (newline)
+	    (insert npc-name))
+
+	; The :NPCS: drawer doesn't exist, create it and add the new npc-name
+	(insert (concat "\n:NPCS:\n" npc-name "\n:END:\n")))
+
+      ; Fold the Drawer closed
+      (search-backward ":NPCS:" nil t)
+      (org-cycle)))
+  
+  ; Return the added npc-name
+  npc-name)
+
 (define-prefix-command 'egme-map)
 (define-key mode-specific-map (kbd "g") 'egme-map)
 (define-key egme-map (kbd "r") 'egme-roll-dice)
