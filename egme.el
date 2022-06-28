@@ -480,6 +480,7 @@ NPCS are stored at the end of the file, under an :NPCS: drawer. It will search b
   npc-name)
 
 (define-prefix-command 'egme-map)
-(define-key mode-specific-map (kbd "g") 'egme-map)
+(define-key mode-specific-map (kbd "C-g") 'egme-map)
 (define-key egme-map (kbd "r") 'egme-roll-dice)
 (define-key egme-map (kbd "q") 'egme-y-n-oracle)
+(define-key egme-map (kbd "n") 'egme-add-npc)

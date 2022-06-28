@@ -28,7 +28,7 @@ Usage should be easy to gleam by reading the ~egme.org~ - I have tried to heavil
 
 ** Dice Roller
 
-The first main feature is the dice roller, the function "egme-roll-dice". This can either be called with "M-x egme-roll-dice", or by the default keybind of "C-c g r". 
+The first main feature is the dice roller, the function "egme-roll-dice". This can either be called with "M-x egme-roll-dice", or by the default keybind of "C-c C-g r". 
 After calling, the user is asked to input a dice roll into the mini-buffer. This is to be input as per any usual RPG dice roll, with a modifier, without spaces. Examples of valid choices are:-
 - 1d20
 - 2D6+3
@@ -56,7 +56,7 @@ This function keeps a history of rolls that have been made previoulsy - if you g
 
 ** Yes/No Oracle
 
-This features is the main driver of solo-roleplaying with EmacsGME, the yes/no oracle. This function is named "egme-y-n-oracle", and can be called interactively with "M-x egme-y-n-oracle", or with the default keybind of "C-c g q".
+This features is the main driver of solo-roleplaying with EmacsGME, the yes/no oracle. This function is named "egme-y-n-oracle", and can be called interactively with "M-x egme-y-n-oracle", or with the default keybind of "C-c C-g q".
 Once called, it will ask the user what question is being asked. Here you can type a question into the minibuffer, which will be included with any output - this is optional. It will also scan the current line, and if a question is found it will be used as the initial input.
 Once a question has been set (or given blank input) then the function asks for probability. This is a sliding scale between +4 and -4, with a description ranging from "Near Certain" to "Near Impossible" - this will affect the likelihood of getting a yes or no, for tweaking probabilities on a per-question case.. Options are chosen by typing the modifier, or scrolling between them using left & right on the keyboard. The deafult option is "0  Even Odds" - just hit enter for a question with unclear probability. An example of this output is:-
 
