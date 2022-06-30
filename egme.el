@@ -473,7 +473,7 @@ NPCS are stored at the end of the file, under an :NPCS: drawer. It will search b
   ;; Ask for NPC name if nothing is passed to the function
   (if npc-name
       t
-    (setq npc-name (read-string "New NPC name?")))
+    (setq npc-name (read-string "New NPC name? ")))
 
   ;; save-excursion so cursor returns to users current position
   (save-excursion
@@ -483,12 +483,14 @@ NPCS are stored at the end of the file, under an :NPCS: drawer. It will search b
       ;; Search backwards for ":NPCS:" 
       (if (search-backward ":NPCS:" nil t)
 
-	  ;; The drawer has been found, check if npc-name already exists
-	  (progn
-	    (egme-open-org-drawer)
-	    (end-of-line)
-	    (newline)
-	    (insert npc-name))
+	  ;; The drawer has been found, check if npc-name already exists - add if missing, throw an error if it already exists
+	  (if (member npc-name (egme-parse-npc-list))
+	      (user-error "NPC is already in the list")
+	    (progn
+	      (egme-open-org-drawer)
+	      (end-of-line)
+	      (newline)
+	      (insert npc-name)))
 
 	;; The :NPCS: drawer doesn't exist, create it and add the new npc-name
 	(insert (concat "\n:NPCS:\n" npc-name "\n:END:\n")))
