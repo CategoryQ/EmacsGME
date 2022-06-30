@@ -356,6 +356,24 @@ This function then returns the random event text, for the calling function to pa
 	;; Return text output
 	egme-random-event-output)))
 
+(defun egme-open-org-drawer ()
+  "This function will open an org-mode drawer on the current line, if it is currently closed.
+
+Open state is determined by checking if current line is a drawer, and if the text at the end of the line is visible. If it is invisible, open the drawer with org-cycle."
+
+  (if (and (org-at-drawer-p) (invisible-p (point-at-eol)))
+      (org-cycle)
+    (user-error "No closed drawer to open")))
+
+(defun egme-close-org-drawer ()
+  "This function will close an org-mode drawer on the current line, if it is currently open.
+
+Open state is determined by checking if current line is a drawer, and if the text at the end of the line is visible. If it is not invisible, close the drawer with org-cycle."
+
+  (if (and (org-at-drawer-p) (not (invisible-p (point-at-eol))))
+      (org-cycle)
+    (user-error "No open drawer to close")))
+
 (defun egme-roll-dice ()
   "This function is for a user to generate the results from a dice roll, and output them into the current buffer.
 
@@ -452,33 +470,34 @@ NPCS are stored at the end of the file, under an :NPCS: drawer. It will search b
 
   (interactive)
 
-  ; Ask for NPC name if nothing is passed to the function
+  ;; Ask for NPC name if nothing is passed to the function
   (if npc-name
       t
     (setq npc-name (read-string "New NPC name?")))
 
-  ; save-excursion so cursor returns to users current position
+  ;; save-excursion so cursor returns to users current position
   (save-excursion
     (progn
       (end-of-buffer)
       
-      ; Search backwards for ":NPCS:" 
+      ;; Search backwards for ":NPCS:" 
       (if (search-backward ":NPCS:" nil t)
 
-	  ; The drawer has been found, check if npc-name already exists
+	  ;; The drawer has been found, check if npc-name already exists
 	  (progn
+	    (egme-open-org-drawer)
 	    (end-of-line)
 	    (newline)
 	    (insert npc-name))
 
-	; The :NPCS: drawer doesn't exist, create it and add the new npc-name
+	;; The :NPCS: drawer doesn't exist, create it and add the new npc-name
 	(insert (concat "\n:NPCS:\n" npc-name "\n:END:\n")))
 
-      ; Fold the Drawer closed
+      ;; Fold the Drawer closed
       (search-backward ":NPCS:" nil t)
-      (org-cycle)))
+      (egme-close-org-drawer)))
   
-  ; Return the added npc-name
+  ;; Return the added npc-name
   npc-name)
 
 (defun egme-parse-npc-list ()
@@ -499,7 +518,7 @@ If the :NPC: drawer cannot be found, then an error message will be created, and 
 	  ;; Drawer found, turn it into a list
 	  (progn
 	    ;; Open drawer before parsing
-	    (org-cycle)
+	    (egme-open-org-drawer)
 	    (next-line)
 
 	    ;; Loop until end of drawer found
@@ -511,7 +530,7 @@ If the :NPC: drawer cannot be found, then an error message will be created, and 
 
 	    ;; Close the drawer again
 	    (search-backward ":NPCS" nil t)
-	    (org-cycle))
+	    (egme-close-org-drawer))
 
 	;; No NPC drawer found
 	(user-error "No NPC list in current file"))))
