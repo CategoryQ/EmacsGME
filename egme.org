@@ -281,6 +281,14 @@ The below intitializes the ~egme-random-counter~ as zero, and set's the possible
 #+END_SRC
 
 
+*** NPC List
+
+Create a blank list ~egme-npc-list~, which is populated with the NPC list stored in each game file.
+
+#+BEGIN_SRC emacs-lisp :tangle yes :results silent
+(setq egme-npc-list (list))
+#+END_SRC
+
 * Functions
 
 Below are the planned functions, along with some scratch code testing ideas.
@@ -656,9 +664,6 @@ The function egme-random-event is also called to see if anything unexpected occu
 #+END_SRC
 
 
-** TODO Thread List Handling
-
-
 ** TODO NPC List Handling
 
 The NPC list is stored at the end of the file, under an org header called "EmacsGME Store", and within a drawer called "NPCS" - which would look something like:-
@@ -716,14 +721,59 @@ NPCS are stored at the end of the file, under an :NPCS: drawer. It will search b
   npc-name)
 #+END_SRC
 
-*** TODO Parse NPCs to list
+*** DONE Parse NPCs to list
+CLOSED: [2022-06-30 Thu 01:07]
 
-This function will find the NPC list within the current file, and return it as a list. If an NPC list does not yet exist, it will return ~nil~ and throw a user error. 
+This function will find the NPC list within the current file, and return it as a list. If an NPC list does not yet exist, it will return ~nil~ and throw a user error.
+
+#+BEGIN_SRC emacs-lisp :tangle yes :resuls silent
+(defun egme-parse-npc-list ()
+    "This function gets locates the NPC list in the given file, and store all the names in the list egme-npc-list
+
+If the :NPC: drawer cannot be found, then an error message will be created, and the function returns nil. Otherwise, the generated list will be returned (in addtion to being added to egme-npc-list variable)."
+
+  ; Clear any existing data from the stored list variable.
+  (setq egme-npc-list (list))
+
+  (save-excursion
+    (progn
+      (end-of-buffer)
+
+      ;; Find NPC drawer
+      (if (search-backward ":NPCS:" nil t)
+
+	  ;; Drawer found, turn it into a list
+	  (progn
+	    ;; Open drawer before parsing
+	    (org-cycle)
+	    (next-line)
+
+	    ;; Loop until end of drawer found
+	    (while (not (string-match "^:END:" (thing-at-point 'line t)))
+	      (progn
+		;; Add current element, minus final character (trailing newline), then move to next
+		(push (substring (thing-at-point 'line t) 0 -1) egme-npc-list)
+		(next-line)))
+
+	    ;; Close the drawer again
+	    (search-backward ":NPCS" nil t)
+	    (org-cycle))
+
+	;; No NPC drawer found
+	(user-error "No NPC list in current file"))))
+
+  ; Return list contents (or nil if nothing is found)
+  egme-npc-list)
+#+END_SRC
 
 *** TODO Delete NPC
 
 This function will remove an NPC from the list - the parsed list will be provided to the user, a selection is made, and the new list is written to the file.
 
+
+** TODO Thread List Handling
+
+Much of this will be a copy & paste from the NPC list department, with minor changes.
 
 * TODO Key map/Key bindings
 

@@ -200,6 +200,8 @@
 			      "NPC negative"
 			      "Ambiguous event"))
 
+(setq egme-npc-list (list))
+
 (defun egme-random-list-item (list-to-pick-from)
   "This function takes a list as an argument, and returns a random element from within that list.
 
@@ -478,6 +480,44 @@ NPCS are stored at the end of the file, under an :NPCS: drawer. It will search b
   
   ; Return the added npc-name
   npc-name)
+
+(defun egme-parse-npc-list ()
+    "This function gets locates the NPC list in the given file, and store all the names in the list egme-npc-list
+
+If the :NPC: drawer cannot be found, then an error message will be created, and the function returns nil. Otherwise, the generated list will be returned (in addtion to being added to egme-npc-list variable)."
+
+  ; Clear any existing data from the stored list variable.
+  (setq egme-npc-list (list))
+
+  (save-excursion
+    (progn
+      (end-of-buffer)
+
+      ;; Find NPC drawer
+      (if (search-backward ":NPCS:" nil t)
+
+	  ;; Drawer found, turn it into a list
+	  (progn
+	    ;; Open drawer before parsing
+	    (org-cycle)
+	    (next-line)
+
+	    ;; Loop until end of drawer found
+	    (while (not (string-match "^:END:" (thing-at-point 'line t)))
+	      (progn
+		;; Add current element, minus final character (trailing newline), then move to next
+		(push (substring (thing-at-point 'line t) 0 -1) egme-npc-list)
+		(next-line)))
+
+	    ;; Close the drawer again
+	    (search-backward ":NPCS" nil t)
+	    (org-cycle))
+
+	;; No NPC drawer found
+	(user-error "No NPC list in current file"))))
+
+  ; Return list contents (or nil if nothing is found)
+  egme-npc-list)
 
 (define-prefix-command 'egme-map)
 (define-key mode-specific-map (kbd "C-g") 'egme-map)
