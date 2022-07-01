@@ -300,8 +300,8 @@ If the current buffer is an org-mode document, the output is placed inside a quo
   ;;; Output the start line
   ;; Check if current buffer is an org-mode file, and output accordingly
   (if (equal (with-current-buffer (current-buffer) major-mode) 'org-mode)
-      ;; If an org-file, output into a quote block
-      (insert "#+BEGIN_QUOTE GamesMaster")
+      ;; If an org-file, output into a GamesMaster block
+      (insert "#+BEGIN_GamesMaster")
     ;; Else output the opening brace
     (insert egme-print-line-start))
 
@@ -315,8 +315,8 @@ If the current buffer is an org-mode document, the output is placed inside a quo
   ;;;; Output the end line
   ;; Check if current buffer is an org-mode file
   (if (equal (with-current-buffer (current-buffer) major-mode) 'org-mode)
-      ;; If an org-file, close the quote block
-      (insert "#+END_QUOTE GamesMaster")
+      ;; If an org-file, close the GamesMaster block
+      (insert "#+END_GamesMaster")
     ;; Else output the closing brace brace
     (insert egme-print-line-end))
   
@@ -336,25 +336,29 @@ This function then returns the random event text, for the calling function to pa
 
     ;; Clear random event output text
     (setq egme-random-event-output nil)
-  
-    (cond
-      ;; Compare the random counter to a d20 roll
-      ((< (egme-calculate-dice "1d20") egme-random-counter)
 
-       ;; Announce the event
-       (setq egme-random-event-output "\n------------\nRandom Event!")
-      
-        ;; Add a type of random event
-        (setq egme-random-event-output (concat egme-random-event-output (format "\n      Focus:  %s" (egme-random-list-item egme-random-event-list))))
+    ;; Compare the random counter to a d20 roll
+    (if (< (egme-calculate-dice "1d20") egme-random-counter)
 
-	;; Add event details
-	(setq egme-random-event-output (concat egme-random-event-output (format "\n     Detail:  %s" (egme-random-list-item egme-action-list))(format " / %s" (egme-random-list-item egme-subject-list))))
+	;; Below batch of steps to take if 
+	(progn
+	  ;; Announce the event
+	  (setq egme-random-event-output "\n------------\nRandom Event!")
 
-	;; Reset the random counter
-	(setq egme-random-counter 0)
+          ;; Add a type of random event
+          (setq egme-random-event-output (concat egme-random-event-output (format "\n      Focus:  %s" (egme-random-list-item egme-random-event-list))))
 
-	;; Return text output
-	egme-random-event-output)))
+	  ;; Add event details
+	  (setq egme-random-event-output (concat egme-random-event-output (format "\n     Detail:  %s" (egme-random-list-item egme-action-list))(format " / %s" (egme-random-list-item egme-subject-list))))
+
+	  ;; Reset the random counter
+	  (setq egme-random-counter 0)
+
+	  ;; Return text output
+	  egme-random-event-output)
+
+      ;; Return nil if no event found
+      nil))
 
 (defun egme-open-org-drawer ()
   "This function will open an org-mode drawer on the current line, if it is currently closed.
@@ -587,3 +591,4 @@ The NPC list is parsed, and all are offered as options with ido-completing-read.
 (define-key egme-map (kbd "r") 'egme-roll-dice)
 (define-key egme-map (kbd "q") 'egme-y-n-oracle)
 (define-key egme-map (kbd "n") 'egme-add-npc)
+(define-key egme-map (kbd "d") 'egme-delete-npc)
