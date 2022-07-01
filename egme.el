@@ -345,8 +345,14 @@ This function then returns the random event text, for the calling function to pa
 	  ;; Announce the event
 	  (setq egme-random-event-output "\n------------\nRandom Event!")
 
-          ;; Add a type of random event
+          ;; Pick random event from the random event focus list
           (setq egme-random-event-output (concat egme-random-event-output (format "\n      Focus:  %s" (egme-random-list-item egme-random-event-list))))
+
+	  ;; Check if it's an NPC event, add a random NPC from the list - just checks if "NPC" is in the current print output variable
+	  (if (string-match-p "NPC" egme-random-event-output)
+	      ;; Only change output if NPC list is non-nil
+	      (if (egme-parse-npc-list)
+		  (setq egme-random-event-output (concat egme-random-event-output (format "\n        NPC:  %s" (egme-random-list-item (egme-parse-npc-list)))))))
 
 	  ;; Add event details
 	  (setq egme-random-event-output (concat egme-random-event-output (format "\n     Detail:  %s" (egme-random-list-item egme-action-list))(format " / %s" (egme-random-list-item egme-subject-list))))
