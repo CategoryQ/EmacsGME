@@ -200,6 +200,8 @@
 			      "NPC negative"
 			      "Ambiguous event"))
 
+(setq egme-npc-list (list))
+
 (defun egme-random-list-item (list-to-pick-from)
   "This function takes a list as an argument, and returns a random element from within that list.
 
@@ -298,8 +300,8 @@ If the current buffer is an org-mode document, the output is placed inside a quo
   ;;; Output the start line
   ;; Check if current buffer is an org-mode file, and output accordingly
   (if (equal (with-current-buffer (current-buffer) major-mode) 'org-mode)
-      ;; If an org-file, output into a quote block
-      (insert "#+BEGIN_QUOTE GamesMaster")
+      ;; If an org-file, output into a GamesMaster block
+      (insert "#+BEGIN_GamesMaster")
     ;; Else output the opening brace
     (insert egme-print-line-start))
 
@@ -313,8 +315,8 @@ If the current buffer is an org-mode document, the output is placed inside a quo
   ;;;; Output the end line
   ;; Check if current buffer is an org-mode file
   (if (equal (with-current-buffer (current-buffer) major-mode) 'org-mode)
-      ;; If an org-file, close the quote block
-      (insert "#+END_QUOTE GamesMaster")
+      ;; If an org-file, close the GamesMaster block
+      (insert "#+END_GamesMaster")
     ;; Else output the closing brace brace
     (insert egme-print-line-end))
   
@@ -334,25 +336,57 @@ This function then returns the random event text, for the calling function to pa
 
     ;; Clear random event output text
     (setq egme-random-event-output nil)
+
+    ;; Compare the random counter to a d20 roll
+    (if (< (egme-calculate-dice "1d20") egme-random-counter)
+
+	;; Below batch of steps to take if 
+	(progn
+	  ;; Announce the event
+	  (setq egme-random-event-output "\n------------\nRandom Event!")
+
+          ;; Pick random event from the random event focus list
+          (setq egme-random-event-output (concat egme-random-event-output (format "\n      Focus:  %s" (egme-random-list-item egme-random-event-list))))
+
+	  ;; Check if it's an NPC event, add a random NPC from the list - just checks if "NPC" is in the current print output variable
+	  (if (string-match-p "NPC" egme-random-event-output)
+	      ;; Only change output if NPC list is non-nil
+	      (if (egme-parse-npc-list)
+		  (setq egme-random-event-output (concat egme-random-event-output (format "\n        NPC:  %s" (egme-random-list-item (egme-parse-npc-list)))))))
+
+	  ;; Add event details
+	  (setq egme-random-event-output (concat egme-random-event-output (format "\n     Detail:  %s" (egme-random-list-item egme-action-list))(format " / %s" (egme-random-list-item egme-subject-list))))
+
+	  ;; Reset the random counter
+	  (setq egme-random-counter 0)
+
+	  ;; Return text output
+	  egme-random-event-output)
+
+      ;; Return nil if no event found
+      nil))
+
+(defun egme-open-org-drawer ()
+  "This function will open an org-mode drawer on the current line, if it is currently closed.
+
+Open state is determined by checking if current line is a drawer, and if the text at the end of the line is visible. If it is invisible, open the drawer with org-cycle."
+
+  (interactive)
+
+  (if (and (org-at-drawer-p) (invisible-p (point-at-eol)))
+      (org-cycle)
+    (message "No closed drawer to open.")))
+
+(defun egme-close-org-drawer ()
+  "This function will close an org-mode drawer on the current line, if it is currently open.
+
+Open state is determined by checking if current line is a drawer, and if the text at the end of the line is visible. If it is not invisible, close the drawer with org-cycle."
+
+  (interactive)
   
-    (cond
-      ;; Compare the random counter to a d20 roll
-      ((< (egme-calculate-dice "1d20") egme-random-counter)
-
-       ;; Announce the event
-       (setq egme-random-event-output "\n------------\nRandom Event!")
-      
-        ;; Add a type of random event
-        (setq egme-random-event-output (concat egme-random-event-output (format "\n      Focus:  %s" (egme-random-list-item egme-random-event-list))))
-
-	;; Add event details
-	(setq egme-random-event-output (concat egme-random-event-output (format "\n     Detail:  %s" (egme-random-list-item egme-action-list))(format " / %s" (egme-random-list-item egme-subject-list))))
-
-	;; Reset the random counter
-	(setq egme-random-counter 0)
-
-	;; Return text output
-	egme-random-event-output)))
+  (if (and (org-at-drawer-p) (not (invisible-p (point-at-eol))))
+      (org-cycle)
+    (message "No open drawer to close")))
 
 (defun egme-roll-dice ()
   "This function is for a user to generate the results from a dice roll, and output them into the current buffer.
@@ -443,7 +477,124 @@ The function egme-random-event is also called to see if anything unexpected occu
     ; Send output string to display to user 
     (egme-print-output egme-oracle-output))
 
+(defun egme-add-npc (&optional npc-name)
+  "This function adds an NPC to the current file.
+
+NPCS are stored at the end of the file, under an :NPCS: drawer. It will search backwards from the end of the file for the drawer, and create it if not found. npc-name is then inserted on at the beginning of the drawer."
+
+  (interactive)
+
+  ;; Ask for NPC name if nothing is passed to the function
+  (if npc-name
+      t
+    (setq npc-name (read-string "New NPC name? ")))
+
+  ;; save-excursion so cursor returns to users current position
+  (save-excursion
+    (progn
+      (end-of-buffer)
+      
+      ;; Search backwards for ":NPCS:" 
+      (if (search-backward ":NPCS:" nil t)
+
+	  ;; The drawer has been found, check if npc-name already exists - add if missing, throw an error if it already exists
+	  (if (member npc-name (egme-parse-npc-list))
+	      (user-error "NPC is already in the list")
+	    (progn
+	      (egme-open-org-drawer)
+	      (end-of-line)
+	      (newline)
+	      (insert npc-name)))
+
+	;; The :NPCS: drawer doesn't exist, create it and add the new npc-name
+	(insert (concat "\n:NPCS:\n" npc-name "\n:END:\n")))
+
+      ;; Fold the Drawer closed
+      (search-backward ":NPCS:" nil t)
+      (egme-close-org-drawer)))
+  
+  ;; Return the added npc-name
+  npc-name)
+
+(defun egme-parse-npc-list ()
+    "This function gets locates the NPC list in the given file, and store all the names in the list egme-npc-list
+
+If the :NPC: drawer cannot be found, then an error message will be created, and the function returns nil. Otherwise, the generated list will be returned (in addtion to being added to egme-npc-list variable)."
+
+    (setq egme-npc-list nil)
+        
+  (save-excursion
+    (progn
+      (end-of-buffer)
+
+      ;; Find NPC drawer
+      (if (search-backward ":NPCS:" nil t)
+
+	  ;; Drawer found, turn it into a list
+	  (progn
+	    ;; Open drawer before parsing
+	    (egme-open-org-drawer)
+	    (next-line)
+
+	    ;; Loop until end of drawer found
+	    (while (not (string-match "^:END:" (thing-at-point 'line t)))
+	      (progn
+		;; Add current element, minus final character (trailing newline), then move to next
+		(push (substring (thing-at-point 'line t) 0 -1) egme-npc-list)
+		(next-line)))
+
+	    ;; Close the drawer again
+	    (search-backward ":NPCS:" nil t)
+	    (egme-close-org-drawer))
+
+	;; No NPC drawer found
+	(message "No NPC list in current file"))))
+
+  ; Return list contents (or nil if nothing is found)
+  egme-npc-list)
+
+(defun egme-delete-npc ()
+  "This function deletes an NPC from the active list.
+
+The NPC list is parsed, and all are offered as options with ido-completing-read. This is then found within the NPC list drawer, and the chosen option is deleted. This function then re-parses and returns the updated list."
+
+  (interactive)
+
+  ;; Check NPC list has been created
+  (if (egme-parse-npc-list)
+      
+      ;; Parse latest NPC list, and get user input for which to delete
+      (setq deleting-npc (ido-completing-read "NPC to delete? " (egme-parse-npc-list)))
+    
+    ;; Throw an error if nothing found
+    (user-error "No NPCs in current file"))
+
+  (save-excursion
+    (progn
+
+      ;; Go to end of buffer, then look backwards for the NPC list and open it
+      (end-of-buffer)
+      (search-backward ":NPCS:" nil t)
+      (egme-open-org-drawer)
+
+      ;; Search forwards for the selected deletion
+      (search-forward deleting-npc nil t)
+      (beginning-of-line)
+
+      ;; Delete line and remove the newline to avoid a blank entry
+      (kill-line)
+      (kill-line)
+
+      ;; Close the NPC drawer
+      (search-backward ":NPCS:" nil t)
+      (egme-close-org-drawer)))
+
+  ;; Return updated list
+  (egme-parse-npc-list))
+
 (define-prefix-command 'egme-map)
-(define-key mode-specific-map (kbd "g") 'egme-map)
+(define-key mode-specific-map (kbd "C-g") 'egme-map)
 (define-key egme-map (kbd "r") 'egme-roll-dice)
 (define-key egme-map (kbd "q") 'egme-y-n-oracle)
+(define-key egme-map (kbd "n") 'egme-add-npc)
+(define-key egme-map (kbd "d") 'egme-delete-npc)
