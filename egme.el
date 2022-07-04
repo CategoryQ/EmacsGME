@@ -211,7 +211,7 @@ Will return nil if provided list is nil."
     (list-to-pick-from (nth (random (length list-to-pick-from)) list-to-pick-from))
     (t nil)))
 
-  (defun egme-get-dice ()
+(defun egme-get-dice ()
     "Get the required dice-roll from user input on the mini-buffer. Dice rolls to be expected in the usual [number]D[dice-type][modifier] format used by RPGs, for example '2D6' for 2 six-sided dice, or '3d8+2' for 3 eight-sided dice, with 2 added to the result. If the format is given without number (for example 'd100'), then it is assume to be a single dice being rolled.
 
 If no input is given, then it will return the last dice rolled. A full history of rolls is stored in 'egme-dice-history', accessible via the arrow keys when asked for input.
@@ -324,7 +324,7 @@ If the current buffer is an org-mode document, the output is placed inside a quo
 
   t)
 
-  (defun egme-random-event ()
+(defun egme-random-event ()
     "A function for genereating unexpected events.
 
 When an oracle question is asked, this function is called. It keeps a counter in the variable egme-random-counter, which is incremented easch time this is called. Then a single 1d20 is rolled - if the result is lower than the current egme-random-counter value, then a random event is generated. A focus, action and subject are randomly selected from the lists (egme-random-event-list, egme-action-list, and egme-subject-list respectively). If a random event was generated, the counter is reset to 0.
@@ -340,28 +340,34 @@ This function then returns the random event text, for the calling function to pa
     ;; Compare the random counter to a d20 roll
     (if (< (egme-calculate-dice "1d20") egme-random-counter)
 
-	;; Below batch of steps to take if 
-	(progn
-	  ;; Announce the event
-	  (setq egme-random-event-output "\n------------\nRandom Event!")
+        ;; Below batch of steps to take if 
+        (progn
+          ;; Announce the event
+          (setq egme-random-event-output "\n------------\nRandom Event!")
 
           ;; Pick random event from the random event focus list
           (setq egme-random-event-output (concat egme-random-event-output (format "\n      Focus:  %s" (egme-random-list-item egme-random-event-list))))
 
-	  ;; Check if it's an NPC event, add a random NPC from the list - just checks if "NPC" is in the current print output variable
-	  (if (string-match-p "NPC" egme-random-event-output)
-	      ;; Only change output if NPC list is non-nil
-	      (if (egme-parse-npc-list)
-		  (setq egme-random-event-output (concat egme-random-event-output (format "\n        NPC:  %s" (egme-random-list-item (egme-parse-npc-list)))))))
+          ;; Check if it's an NPC event, add a random NPC from the list - just checks if "NPC" is in the current print output variable
+          (if (string-match-p "NPC" egme-random-event-output)
+              ;; Only change output if NPC list is non-nil
+              (if (egme-parse-npc-list)
+                  (setq egme-random-event-output (concat egme-random-event-output (format "\n        NPC:  %s" (egme-random-list-item (egme-parse-npc-list)))))))
 
-	  ;; Add event details
-	  (setq egme-random-event-output (concat egme-random-event-output (format "\n     Detail:  %s" (egme-random-list-item egme-action-list))(format " / %s" (egme-random-list-item egme-subject-list))))
+          ;; Check if it's a Thread event, add a random Thread from the list - just checks if "thread" is in the current print output variable
+          (if (string-match-p "thread" egme-random-event-output)
+              ;; Only change output if Thread list is non-nil
+              (if (egme-parse-thread-list)
+                  (setq egme-random-event-output (concat egme-random-event-output (format "\n     Thread:  %s" (egme-random-list-item (egme-parse-thread-list)))))))
 
-	  ;; Reset the random counter
-	  (setq egme-random-counter 0)
+          ;; Add event details
+          (setq egme-random-event-output (concat egme-random-event-output (format "\n     Detail:  %s" (egme-random-list-item egme-action-list))(format " / %s" (egme-random-list-item egme-subject-list))))
 
-	  ;; Return text output
-	  egme-random-event-output)
+          ;; Reset the random counter
+          (setq egme-random-counter 0)
+
+          ;; Return text output
+          egme-random-event-output)
 
       ;; Return nil if no event found
       nil))
@@ -411,7 +417,7 @@ This function is interactively callable via M-x, and a prime input option for ke
   (egme-print-output (concat (format "Rolled:  %s" egme-current-dice) (format "\nResult:  %s" egme-roll-result)))
   egme-roll-result)
 
-  (defun egme-y-n-oracle ()
+(defun egme-y-n-oracle ()
     "The basic oracle function. This will provide Yes/No answers to questions posed to the games master, and outputs the results in the current buffer in the standard games master format.
 
 The user will be asked to input a question - if the end of the current line is parsed as a question, then that will be set as the initial user input. If a quesiton is provided, it will be printed along with the results.
@@ -519,7 +525,7 @@ NPCS are stored at the end of the file, under an :NPCS: drawer. It will search b
 (defun egme-parse-npc-list ()
     "This function gets locates the NPC list in the given file, and store all the names in the list egme-npc-list
 
-If the :NPC: drawer cannot be found, then an error message will be created, and the function returns nil. Otherwise, the generated list will be returned (in addtion to being added to egme-npc-list variable)."
+If the :NPCS: drawer cannot be found, then an error message will be created, and the function returns nil. Otherwise, the generated list will be returned (in addtion to being added to egme-npc-list variable)."
 
     (setq egme-npc-list nil)
         
@@ -592,9 +598,126 @@ The NPC list is parsed, and all are offered as options with ido-completing-read.
   ;; Return updated list
   (egme-parse-npc-list))
 
+(defun egme-add-thread (&optional new-thread)
+  "This function adds a Thread to the current file.
+
+Threads are stored at the end of the file, under an :THREADS: drawer. It will search backwards from the end of the file for the drawer, and create it if not found. new-thread is then inserted on at the beginning of the drawer."
+
+  (interactive)
+
+  ;; Ask for Thread if nothing is passed to the function
+  (if new-thread
+      t
+    (setq new-thread (read-string "New Thread description? ")))
+
+  ;; save-excursion so cursor returns to users current position
+  (save-excursion
+    (progn
+      (end-of-buffer)
+      
+      ;; Search backwards for ":THREADS:" 
+      (if (search-backward ":THREADS:" nil t)
+
+	  ;; The drawer has been found, check if npc-name already exists - add if missing, throw an error if it already exists
+	  (if (member new-thread (egme-parse-thread-list))
+	      (user-error "Thread is already in the list")
+	    (progn
+	      (egme-open-org-drawer)
+	      (end-of-line)
+	      (newline)
+	      (insert new-thread)))
+
+	;; The :THREADS: drawer doesn't exist, create it and add the new-thread
+	(insert (concat "\n:THREADS:\n" new-thread "\n:END:\n")))
+
+      ;; Fold the Drawer closed
+      (search-backward ":THREADS:" nil t)
+      (egme-close-org-drawer)))
+  
+  ;; Return the added new-thread
+  new-thread)
+
+(defun egme-parse-thread-list ()
+    "This function gets locates the Thread list in the given file, and store all the items in the list egme-thread-list
+
+If the :THREADS: drawer cannot be found, then an error message will be created, and the function returns nil. Otherwise, the generated list will be returned (in addtion to being added to egme-thread-list variable)."
+
+    (setq egme-thread-list nil)
+        
+  (save-excursion
+    (progn
+      (end-of-buffer)
+
+      ;; Find Thread drawer
+      (if (search-backward ":THREADS:" nil t)
+
+	  ;; Drawer found, turn it into a list
+	  (progn
+	    ;; Open drawer before parsing
+	    (egme-open-org-drawer)
+	    (next-line)
+
+	    ;; Loop until end of drawer found
+	    (while (not (string-match "^:END:" (thing-at-point 'line t)))
+	      (progn
+		;; Add current element, minus final character (trailing newline), then move to next
+		(push (substring (thing-at-point 'line t) 0 -1) egme-thread-list)
+		(next-line)))
+
+	    ;; Close the drawer again
+	    (search-backward ":THREADS:" nil t)
+	    (egme-close-org-drawer))
+
+	;; No THREADS drawer found
+	(message "No Thread list in current file"))))
+
+  ; Return list contents (or nil if nothing is found)
+  egme-thread-list)
+
+(defun egme-delete-thread ()
+  "This function deletes a Thread from the active list.
+
+The Thread list is parsed, and all are offered as options with ido-completing-read. This is then found within the Thread list drawer, and the chosen option is deleted. This function then re-parses and returns the updated list."
+
+  (interactive)
+
+  ;; Check Thread list has been created
+  (if (egme-parse-thread-list)
+      
+      ;; Parse latest Thread list, and get user input for which to delete
+      (setq deleting-thread (ido-completing-read "Thread to delete? " (egme-parse-thread-list)))
+    
+    ;; Throw an error if nothing found
+    (user-error "No Threads in current file"))
+
+  (save-excursion
+    (progn
+
+      ;; Go to end of buffer, then look backwards for the Thread list and open it
+      (end-of-buffer)
+      (search-backward ":THREADS:" nil t)
+      (egme-open-org-drawer)
+
+      ;; Search forwards for the selected deletion
+      (search-forward deleting-thread nil t)
+      (beginning-of-line)
+
+      ;; Delete line and remove the newline to avoid a blank entry
+      (kill-line)
+      (kill-line)
+
+      ;; Close the Thread drawer
+      (search-backward ":THREADS:" nil t)
+      (egme-close-org-drawer)))
+
+  ;; Return updated list
+  (egme-parse-thread-list))
+
 (define-prefix-command 'egme-map)
 (define-key mode-specific-map (kbd "C-g") 'egme-map)
 (define-key egme-map (kbd "r") 'egme-roll-dice)
 (define-key egme-map (kbd "q") 'egme-y-n-oracle)
 (define-key egme-map (kbd "n") 'egme-add-npc)
-(define-key egme-map (kbd "d") 'egme-delete-npc)
+(define-key egme-map (kbd "N") 'egme-delete-npc)
+(define-key egme-map (kbd "t") 'egme-add-thread)
+(define-key egme-map (kbd "T") 'egme-delete-thread)
