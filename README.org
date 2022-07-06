@@ -1,13 +1,13 @@
 #+TITLE: EmacsGME Readme
 
-* EmacsGME - Emacs Games Master Emulator
+* EmacsGME - Emacs GameMaster Emulator
 
-EmacsGME v0.1
+EmacsGME v0.2-pre
 
 
 * Introduction
 
-EmacsGME is a gamesmaster emulator in the style of MythicGME/CRGE/etc, produced in emacs-lisp for playing solo-roleplaying games entirely within text/org-mode documents.
+EmacsGME is a GameMaster emulator in the style of MythicGME/CRGE/etc, produced in emacs-lisp for playing solo-roleplaying games entirely within text/org-mode documents.
 
 As this is my first real use of emacs-lisp, a lot of it is just me trying out different things in a literate-programming style, with my exploratory document eventually due to tangle into an emacs-lisp file for easy addition into any emacs-setup.
 
@@ -133,16 +133,19 @@ The entire system is developed from a pen & paper system based on actual dice ro
 * Changelog
 
 - v0.1 - Initial release
+- v0.2-pre - Added list handling and basic game state display
 
 
 * TO-DO List
 
 The following items are currently on the todo list - I am open to further suggestions of how this can be improved.
 
-- Saving variables between sessions
-- Handling a list of NPCs
-- Handling a list of threads
-- Possibly implement as a minor-mode - with siderbar buffer showing game info (threads/NPCs/etc)
+- +Saving variables between sessions+
+- +Handling a list of NPCs+
+- +Handling a list of threads+
+- +Possibly implement as a minor-mode - with siderbar buffer showing game info (threads/NPCs/etc)+
+- Handle the "New NPC" random event more gracefully
+- Update this README to better reflect the reality of usage
 
   
 * Licensing
