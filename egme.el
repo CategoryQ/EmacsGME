@@ -212,7 +212,7 @@ Will return nil if provided list is nil."
     (list-to-pick-from (nth (random (length list-to-pick-from)) list-to-pick-from))
     (t nil)))
 
-  (defun egme-get-dice ()
+(defun egme-get-dice ()
     "Get the required dice-roll from user input on the mini-buffer. Dice rolls to be expected in the usual [number]D[dice-type][modifier] format used by RPGs, for example '2D6' for 2 six-sided dice, or '3d8+2' for 3 eight-sided dice, with 2 added to the result. If the format is given without number (for example 'd100'), then it is assume to be a single dice being rolled.
 
 If no input is given, then it will return the last dice rolled. A full history of rolls is stored in 'egme-dice-history', accessible via the arrow keys when asked for input.
@@ -325,53 +325,53 @@ If the current buffer is an org-mode document, the output is placed inside a quo
 
   t)
 
-    (defun egme-random-event ()
-      "A function for genereating unexpected events.
+(defun egme-random-event ()
+    "A function for genereating unexpected events.
 
-  When an oracle question is asked, this function is called. It keeps a counter in the variable egme-random-counter, which is incremented easch time this is called. Then a single 1d20 is rolled - if the result is lower than the current egme-random-counter value, then a random event is generated. A focus, action and subject are randomly selected from the lists (egme-random-event-list, egme-action-list, and egme-subject-list respectively). If a random event was generated, the counter is reset to 0.
+When an oracle question is asked, this function is called. It keeps a counter in the variable egme-random-counter, which is incremented easch time this is called. Then a single 1d20 is rolled - if the result is lower than the current egme-random-counter value, then a random event is generated. A focus, action and subject are randomly selected from the lists (egme-random-event-list, egme-action-list, and egme-subject-list respectively). If a random event was generated, the counter is reset to 0.
 
-  This function then returns the random event text, for the calling function to pass on to for user output."
+This function then returns the random event text, for the calling function to pass on to for user output."
 
-      ;; Increment random counter
-      (setq egme-random-counter (1+ egme-random-counter))
+    ;; Increment random counter
+    (setq egme-random-counter (1+ egme-random-counter))
 
-      ;; Clear random event output text
-      (setq egme-random-event-output nil)
+    ;; Clear random event output text
+    (setq egme-random-event-output nil)
 
-      ;; Compare the random counter to a d20 roll
-      (if (< (egme-calculate-dice "1d20") egme-random-counter)
+    ;; Compare the random counter to a d20 roll
+    (if (< (egme-calculate-dice "1d20") egme-random-counter)
 
-          ;; Below batch of steps to take if 
-          (progn
-            ;; Announce the event
-            (setq egme-random-event-output "\n------------\nRandom Event!")
+        ;; Below batch of steps to take if 
+        (progn
+          ;; Announce the event
+          (setq egme-random-event-output "\n------------\nRandom Event!")
 
-            ;; Pick random event from the random event focus list
-            (setq egme-random-event-output (concat egme-random-event-output (format "\n      Focus:  %s" (egme-random-list-item egme-random-event-list))))
+          ;; Pick random event from the random event focus list
+          (setq egme-random-event-output (concat egme-random-event-output (format "\n      Focus:  %s" (egme-random-list-item egme-random-event-list))))
 
-            ;; Check if it's an NPC event, add a random NPC from the list - just checks if "NPC" is in the current print output variable
-            (if (string-match-p "NPC" egme-random-event-output)
-                ;; Only change output if NPC list is non-nil
-                (if (egme-parse-npc-list)
-                    (setq egme-random-event-output (concat egme-random-event-output (format "\n        NPC:  %s" (egme-random-list-item (egme-parse-npc-list)))))))
+          ;; Check if it's an NPC event, add a random NPC from the list - just checks if "NPC" is in the current print output variable
+          (if (string-match-p "NPC" egme-random-event-output)
+              ;; Only change output if NPC list is non-nil
+              (if (egme-parse-npc-list)
+                  (setq egme-random-event-output (concat egme-random-event-output (format "\n        NPC:  %s" (egme-random-list-item (egme-parse-npc-list)))))))
 
-            ;; Check if it's a Thread event, add a random Thread from the list - just checks if "thread" is in the current print output variable
-            (if (string-match-p "thread" egme-random-event-output)
-                ;; Only change output if Thread list is non-nil
-                (if (egme-parse-thread-list)
-                    (setq egme-random-event-output (concat egme-random-event-output (format "\n     Thread:  %s" (egme-random-list-item (egme-parse-thread-list)))))))
+          ;; Check if it's a Thread event, add a random Thread from the list - just checks if "thread" is in the current print output variable
+          (if (string-match-p "thread" egme-random-event-output)
+              ;; Only change output if Thread list is non-nil
+              (if (egme-parse-thread-list)
+                  (setq egme-random-event-output (concat egme-random-event-output (format "\n     Thread:  %s" (egme-random-list-item (egme-parse-thread-list)))))))
 
-            ;; Add event details
-            (setq egme-random-event-output (concat egme-random-event-output (format "\n     Detail:  %s" (egme-random-list-item egme-action-list))(format " / %s" (egme-random-list-item egme-subject-list))))
+          ;; Add event details
+          (setq egme-random-event-output (concat egme-random-event-output (format "\n     Detail:  %s" (egme-random-list-item egme-action-list))(format " / %s" (egme-random-list-item egme-subject-list))))
 
-            ;; Reset the random counter
-            (setq egme-random-counter 0)
+          ;; Reset the random counter
+          (setq egme-random-counter 0)
 
-            ;; Return text output
-            egme-random-event-output)
+          ;; Return text output
+          egme-random-event-output)
 
-        ;; Return nil if no event found
-        nil))
+      ;; Return nil if no event found
+      nil))
 
 (defun egme-open-org-drawer ()
   "This function will open an org-mode drawer on the current line, if it is currently closed.
@@ -418,7 +418,7 @@ This function is interactively callable via M-x, and a prime input option for ke
   (egme-print-output (concat (format "Rolled:  %s" egme-current-dice) (format "\nResult:  %s" egme-roll-result)))
   egme-roll-result)
 
-  (defun egme-y-n-oracle ()
+(defun egme-y-n-oracle ()
     "The basic oracle function. This will provide Yes/No answers to questions posed to the games master, and outputs the results in the current buffer in the standard games master format.
 
 The user will be asked to input a question - if the end of the current line is parsed as a question, then that will be set as the initial user input. If a quesiton is provided, it will be printed along with the results.
@@ -484,18 +484,22 @@ The function egme-random-event is also called to see if anything unexpected occu
     ; Send output string to display to user 
     (egme-print-output egme-oracle-output))
 
-(defun egme-display-game-state ()
+(defun egme-dashboard ()
   "This function will create a temporary buffer to display current details of the game state.
 
 At present this is the NPC list & Thread list, formatted 1 item per line.
 
-This function always retunrs nil."
+This function always returns nil."
 
   (interactive)
 
   ;; Update all lists from curent file
   (egme-parse-npc-list)
   (egme-parse-thread-list)
+
+  ;; Remember old window split thresholds, and change current to 1 too force a horizontal split
+  (setq egme-old-threshold split-width-threshold)
+  (setq split-width-threshold 1)
 
   ;; Save location in current buffer
   (save-excursion
@@ -504,59 +508,67 @@ This function always retunrs nil."
     (with-output-to-temp-buffer "GameMaster"
       (set-buffer "GameMaster")
 
+      ;; Print header
+      (org-mode)
+      (insert "*eGME- Emacs GameMaster Emulator*\n---\n\n\n")
+
       ;; Check if NPC list is empty
       (if (not egme-npc-list)
-	  
-	  ;; Output when no list found
-	  (insert "No NPCs at present")
-	
-	;; Output when NPCs found
-	(progn
-	  (insert "NPCs\n---\n")
 
-	  ;; Loop through NPC list
-	  (while egme-npc-list
+          ;; Output when no list found
+          (insert "No NPCs at present")
 
-	    ;; Pop the list, using each item as output followed by newline
-	    (insert (pop egme-npc-list))
-	    (newline))))
+        ;; Output when NPCs found
+        (progn
+          (insert "NPCs\n---\n")
+
+          ;; Loop through NPC list
+          (while egme-npc-list
+
+            ;; Pop the list, using each item as output followed by newline
+            (insert (pop egme-npc-list))
+            (newline))))
 
       (newline)
       (newline)
 
       ;; Check if Thread list is empty
       (if (not egme-thread-list)
-	  
-	  ;; Output when no list found
-	  (insert "No Threads at present")
-	
-	;; Output when Threads found
-	(progn
-	  (insert "Threads\n---\n")
 
-	  ;; Loop through Thread list
-	  (while egme-thread-list
+          ;; Output when no list found
+          (insert "No Threads at present")
 
-	    ;; Pop the list, using each item as output followed by newline
-	    (insert (pop egme-thread-list))
-	    (newline)))))
+        ;; Output when Threads found
+        (progn
+          (insert "Threads\n---\n")
+
+          ;; Loop through Thread list
+          (while egme-thread-list
+
+            ;; Pop the list, using each item as output followed by newline
+            (insert (pop egme-thread-list))
+            (newline)))))
 
     ;; Switch to the new window, temporarily alow horizontal changes, and shrink it to fit the contents
     (other-window 1)
     (set-variable 'fit-window-to-buffer-horizontally 1)
     (fit-window-to-buffer)
     ;; Make it a bit bigger because it was shrinking too much...
-    (enlarge-window-horizontally 10)
+    (enlarge-window-horizontally 3)
     (other-window 1))
+
+  ;; Return to original split settings
+  (setq split-width-threshold egme-old-threshold)
+
   nil)
 
 (defun egme-update-display-buffer ()
-  "Simple function to reopen the game-state display if it is visible
+  "Simple function to reopen the game-state display if it is visible.
 
 This is to be called at the end of anything that changes displayed information."
 
   (if (get-buffer-window "GameMaster")
-      (egme-display-game-state)))
+      (egme-dashboard)))
 
 (defun egme-add-npc (&optional npc-name)
   "This function adds an NPC to the current file.
@@ -808,4 +820,4 @@ The Thread list is parsed, and all are offered as options with ido-completing-re
 (define-key egme-map (kbd "N") 'egme-delete-npc)
 (define-key egme-map (kbd "t") 'egme-add-thread)
 (define-key egme-map (kbd "T") 'egme-delete-thread)
-(define-key egme-map (kbd "d") 'egme-display-game-state)
+(define-key egme-map (kbd "d") 'egme-dashboard)

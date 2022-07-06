@@ -728,78 +728,96 @@ The function egme-random-event is also called to see if anything unexpected occu
 
 Several types of lists are stored within the file, for callback at later times. So far, this is just NPCS & Thread lists.
 
-*** TODO List display
+*** TODO Display Dashboard [1/3]
 
 Create a temporary read-only buffer in a split window displaying the current lists. This can become more than just a list dispay, so I have named it such
 
-/TODO/ - move in file, and add more game state info?
+/TODO/
+- [X] force the window to split to the right
+- [ ] make the dashboard function toggle the side buffer
+- [ ] move in file
+- [ ] display main keybinds
+- [ ] add more game state info?
 
-#+BEGIN_SRC emacs-lisp :tangle yes :results silent
-(defun egme-display-game-state ()
-  "This function will create a temporary buffer to display current details of the game state.
 
-At present this is the NPC list & Thread list, formatted 1 item per line.
+#+begin_SRC emacs-lisp :tangle yes :results silent
+  (defun egme-dashboard ()
+    "This function will create a temporary buffer to display current details of the game state.
 
-This function always retunrs nil."
+  At present this is the NPC list & Thread list, formatted 1 item per line.
 
-  (interactive)
+  This function always returns nil."
 
-  ;; Update all lists from curent file
-  (egme-parse-npc-list)
-  (egme-parse-thread-list)
+    (interactive)
 
-  ;; Save location in current buffer
-  (save-excursion
+    ;; Update all lists from curent file
+    (egme-parse-npc-list)
+    (egme-parse-thread-list)
 
-    ;; Create temporary read-only buffer and move to it for output
-    (with-output-to-temp-buffer "GameMaster"
-      (set-buffer "GameMaster")
+    ;; Remember old window split thresholds, and change current to 1 too force a horizontal split
+    (setq egme-old-threshold split-width-threshold)
+    (setq split-width-threshold 1)
 
-      ;; Check if NPC list is empty
-      (if (not egme-npc-list)
-	  
-	  ;; Output when no list found
-	  (insert "No NPCs at present")
-	
-	;; Output when NPCs found
-	(progn
-	  (insert "NPCs\n---\n")
+    ;; Save location in current buffer
+    (save-excursion
 
-	  ;; Loop through NPC list
-	  (while egme-npc-list
+      ;; Create temporary read-only buffer and move to it for output
+      (with-output-to-temp-buffer "GameMaster"
+        (set-buffer "GameMaster")
 
-	    ;; Pop the list, using each item as output followed by newline
-	    (insert (pop egme-npc-list))
-	    (newline))))
+        ;; Print header
+        (org-mode)
+        (insert "*eGME- Emacs GameMaster Emulator*\n---\n\n\n")
 
-      (newline)
-      (newline)
+        ;; Check if NPC list is empty
+        (if (not egme-npc-list)
 
-      ;; Check if Thread list is empty
-      (if (not egme-thread-list)
-	  
-	  ;; Output when no list found
-	  (insert "No Threads at present")
-	
-	;; Output when Threads found
-	(progn
-	  (insert "Threads\n---\n")
+            ;; Output when no list found
+            (insert "No NPCs at present")
 
-	  ;; Loop through Thread list
-	  (while egme-thread-list
+          ;; Output when NPCs found
+          (progn
+            (insert "NPCs\n---\n")
 
-	    ;; Pop the list, using each item as output followed by newline
-	    (insert (pop egme-thread-list))
-	    (newline)))))
+            ;; Loop through NPC list
+            (while egme-npc-list
 
-    ;; Switch to the new window, temporarily alow horizontal changes, and shrink it to fit the contents
-    (other-window 1)
-    (set-variable 'fit-window-to-buffer-horizontally 1)
-    (fit-window-to-buffer)
-    ;; Make it a bit bigger because it was shrinking too much...
-    (enlarge-window-horizontally 10)
-    (other-window 1))
-  nil)
+              ;; Pop the list, using each item as output followed by newline
+              (insert (pop egme-npc-list))
+              (newline))))
+
+        (newline)
+        (newline)
+
+        ;; Check if Thread list is empty
+        (if (not egme-thread-list)
+
+            ;; Output when no list found
+            (insert "No Threads at present")
+
+          ;; Output when Threads found
+          (progn
+            (insert "Threads\n---\n")
+
+            ;; Loop through Thread list
+            (while egme-thread-list
+
+              ;; Pop the list, using each item as output followed by newline
+              (insert (pop egme-thread-list))
+              (newline)))))
+
+      ;; Switch to the new window, temporarily alow horizontal changes, and shrink it to fit the contents
+      (other-window 1)
+      (set-variable 'fit-window-to-buffer-horizontally 1)
+      (fit-window-to-buffer)
+      ;; Make it a bit bigger because it was shrinking too much...
+      (enlarge-window-horizontally 3)
+      (other-window 1))
+
+    ;; Return to original split settings
+    (setq split-width-threshold egme-old-threshold)
+
+    nil)
 #+END_SRC
 
 *** DONE Update Display Buffer Function
@@ -809,18 +827,18 @@ This function will be called at the end of any list change operations, and will 
 
 #+BEGIN_SRC emacs-lisp :tangle yes :results silent
 (defun egme-update-display-buffer ()
-  "Simple function to reopen the game-state display if it is visible
+  "Simple function to reopen the game-state display if it is visible.
 
 This is to be called at the end of anything that changes displayed information."
 
   (if (get-buffer-window "GameMaster")
-      (egme-display-game-state)))
+      (egme-dashboard)))
 #+END_SRC
 
 *** DONE NPC List Handling
 CLOSED: [2022-07-04 Mon 22:15]
 
-The NPC list is stored at the end of the file, under an org header called "EmacsGME Store", and within a drawer called "NPCS" - which would look something like:-
+The NPC list is stored at the end of the file, in an org drawer called "NPCS" - which would look something like:-
 
 :NPCS:
 Alice
@@ -1136,6 +1154,6 @@ All default keybindings are set here for the interactive functions. A new map ~e
 (define-key egme-map (kbd "N") 'egme-delete-npc)
 (define-key egme-map (kbd "t") 'egme-add-thread)
 (define-key egme-map (kbd "T") 'egme-delete-thread)
-(define-key egme-map (kbd "d") 'egme-display-game-state)
+(define-key egme-map (kbd "d") 'egme-dashboard)
 #+END_SRC
 
