@@ -545,8 +545,18 @@ This function always retunrs nil."
     (other-window 1)
     (set-variable 'fit-window-to-buffer-horizontally 1)
     (fit-window-to-buffer)
+    ;; Make it a bit bigger because it was shrinking too much...
+    (enlarge-window-horizontally 10)
     (other-window 1))
   nil)
+
+(defun egme-update-display-buffer ()
+  "Simple function to reopen the game-state display if it is visible
+
+This is to be called at the end of anything that changes displayed information."
+
+  (if (get-buffer-window "GameMaster")
+      (egme-display-game-state)))
 
 (defun egme-add-npc (&optional npc-name)
   "This function adds an NPC to the current file.
@@ -583,6 +593,9 @@ NPCS are stored at the end of the file, under an :NPCS: drawer. It will search b
       ;; Fold the Drawer closed
       (search-backward ":NPCS:" nil t)
       (egme-close-org-drawer)))
+
+  ;; Refresh dispay buffer if open
+  (egme-update-display-buffer)
   
   ;; Return the added npc-name
   npc-name)
@@ -660,6 +673,9 @@ The NPC list is parsed, and all are offered as options with ido-completing-read.
       (search-backward ":NPCS:" nil t)
       (egme-close-org-drawer)))
 
+  ;; Refresh dispay buffer if open
+  (egme-update-display-buffer)
+  
   ;; Return updated list
   (egme-parse-npc-list))
 
@@ -698,6 +714,9 @@ Threads are stored at the end of the file, under an :THREADS: drawer. It will se
       ;; Fold the Drawer closed
       (search-backward ":THREADS:" nil t)
       (egme-close-org-drawer)))
+
+  ;; Refresh dispay buffer if open
+  (egme-update-display-buffer)
   
   ;; Return the added new-thread
   new-thread)
@@ -775,6 +794,9 @@ The Thread list is parsed, and all are offered as options with ido-completing-re
       (search-backward ":THREADS:" nil t)
       (egme-close-org-drawer)))
 
+  ;; Refresh dispay buffer if open
+  (egme-update-display-buffer)
+  
   ;; Return updated list
   (egme-parse-thread-list))
 
