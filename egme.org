@@ -728,7 +728,7 @@ The function egme-random-event is also called to see if anything unexpected occu
 
 Several types of lists are stored within the file, for callback at later times. So far, this is just NPCS & Thread lists.
 
-*** TODO Display Dashboard [1/3]
+*** TODO Display Dashboard [1/5]
 
 Create a temporary read-only buffer in a split window displaying the current lists. This can become more than just a list dispay, so I have named it such
 
