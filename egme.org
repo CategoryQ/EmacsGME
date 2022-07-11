@@ -811,7 +811,7 @@ Create a temporary read-only buffer in a split window displaying the current lis
       (set-variable 'fit-window-to-buffer-horizontally 1)
       (fit-window-to-buffer)
       ;; Make it a bit bigger because it was shrinking too much...
-      (enlarge-window-horizontally 3)
+      (enlarge-window-horizontally 7)
       (other-window 1))
 
     ;; Return to original split settings

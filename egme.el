@@ -484,83 +484,83 @@ The function egme-random-event is also called to see if anything unexpected occu
     ; Send output string to display to user 
     (egme-print-output egme-oracle-output))
 
-(defun egme-dashboard ()
-  "This function will create a temporary buffer to display current details of the game state.
+  (defun egme-dashboard ()
+    "This function will create a temporary buffer to display current details of the game state.
 
-At present this is the NPC list & Thread list, formatted 1 item per line.
+  At present this is the NPC list & Thread list, formatted 1 item per line.
 
-This function always returns nil."
+  This function always returns nil."
 
-  (interactive)
+    (interactive)
 
-  ;; Update all lists from curent file
-  (egme-parse-npc-list)
-  (egme-parse-thread-list)
+    ;; Update all lists from curent file
+    (egme-parse-npc-list)
+    (egme-parse-thread-list)
 
-  ;; Remember old window split thresholds, and change current to 1 too force a horizontal split
-  (setq egme-old-threshold split-width-threshold)
-  (setq split-width-threshold 1)
+    ;; Remember old window split thresholds, and change current to 1 too force a horizontal split
+    (setq egme-old-threshold split-width-threshold)
+    (setq split-width-threshold 1)
 
-  ;; Save location in current buffer
-  (save-excursion
+    ;; Save location in current buffer
+    (save-excursion
 
-    ;; Create temporary read-only buffer and move to it for output
-    (with-output-to-temp-buffer "GameMaster"
-      (set-buffer "GameMaster")
+      ;; Create temporary read-only buffer and move to it for output
+      (with-output-to-temp-buffer "GameMaster"
+        (set-buffer "GameMaster")
 
-      ;; Print header
-      (org-mode)
-      (insert "*eGME- Emacs GameMaster Emulator*\n---\n\n\n")
+        ;; Print header
+        (org-mode)
+        (insert "*eGME- Emacs GameMaster Emulator*\n---\n\n\n")
 
-      ;; Check if NPC list is empty
-      (if (not egme-npc-list)
+        ;; Check if NPC list is empty
+        (if (not egme-npc-list)
 
-          ;; Output when no list found
-          (insert "No NPCs at present")
+            ;; Output when no list found
+            (insert "No NPCs at present")
 
-        ;; Output when NPCs found
-        (progn
-          (insert "NPCs\n---\n")
+          ;; Output when NPCs found
+          (progn
+            (insert "NPCs\n---\n")
 
-          ;; Loop through NPC list
-          (while egme-npc-list
+            ;; Loop through NPC list
+            (while egme-npc-list
 
-            ;; Pop the list, using each item as output followed by newline
-            (insert (pop egme-npc-list))
-            (newline))))
+              ;; Pop the list, using each item as output followed by newline
+              (insert (pop egme-npc-list))
+              (newline))))
 
-      (newline)
-      (newline)
+        (newline)
+        (newline)
 
-      ;; Check if Thread list is empty
-      (if (not egme-thread-list)
+        ;; Check if Thread list is empty
+        (if (not egme-thread-list)
 
-          ;; Output when no list found
-          (insert "No Threads at present")
+            ;; Output when no list found
+            (insert "No Threads at present")
 
-        ;; Output when Threads found
-        (progn
-          (insert "Threads\n---\n")
+          ;; Output when Threads found
+          (progn
+            (insert "Threads\n---\n")
 
-          ;; Loop through Thread list
-          (while egme-thread-list
+            ;; Loop through Thread list
+            (while egme-thread-list
 
-            ;; Pop the list, using each item as output followed by newline
-            (insert (pop egme-thread-list))
-            (newline)))))
+              ;; Pop the list, using each item as output followed by newline
+              (insert (pop egme-thread-list))
+              (newline)))))
 
-    ;; Switch to the new window, temporarily alow horizontal changes, and shrink it to fit the contents
-    (other-window 1)
-    (set-variable 'fit-window-to-buffer-horizontally 1)
-    (fit-window-to-buffer)
-    ;; Make it a bit bigger because it was shrinking too much...
-    (enlarge-window-horizontally 3)
-    (other-window 1))
+      ;; Switch to the new window, temporarily alow horizontal changes, and shrink it to fit the contents
+      (other-window 1)
+      (set-variable 'fit-window-to-buffer-horizontally 1)
+      (fit-window-to-buffer)
+      ;; Make it a bit bigger because it was shrinking too much...
+      (enlarge-window-horizontally 7)
+      (other-window 1))
 
-  ;; Return to original split settings
-  (setq split-width-threshold egme-old-threshold)
+    ;; Return to original split settings
+    (setq split-width-threshold egme-old-threshold)
 
-  nil)
+    nil)
 
 (defun egme-update-display-buffer ()
   "Simple function to reopen the game-state display if it is visible.
