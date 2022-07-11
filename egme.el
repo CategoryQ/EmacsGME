@@ -330,7 +330,9 @@ If the current buffer is an org-mode document, the output is placed inside a quo
 
   When an oracle question is asked, this function is called. It keeps a counter in the variable egme-random-counter, which is incremented easch time this is called. Then a single 1d20 is rolled - if the result is lower than the current egme-random-counter value, then a random event is generated. A focus, action and subject are randomly selected from the lists (egme-random-event-list, egme-action-list, and egme-subject-list respectively). If a random event was generated, the counter is reset to 0.
 
-  This function then returns the random event text, for the calling function to pass on to for user output."
+If the chosen event concerns an NPC (ignoring the New NPC event), it will display a random NPC from the current list (if available). Likewise, if the event concerns a thread, it will pick a random one from the list.
+
+This function then returns the random event text, for the calling function to pass on to for user output."
 
       ;; Increment random counter
       (setq egme-random-counter (1+ egme-random-counter))
@@ -349,11 +351,13 @@ If the current buffer is an org-mode document, the output is placed inside a quo
             ;; Pick random event from the random event focus list
             (setq egme-random-event-output (concat egme-random-event-output (format "\n      Focus:  %s" (egme-random-list-item egme-random-event-list))))
 
-            ;; Check if it's an NPC event, add a random NPC from the list - just checks if "NPC" is in the current print output variable
+            ;; Check if it's an NPC event
             (if (string-match-p "NPC" egme-random-event-output)
-                ;; Only change output if NPC list is non-nil
-                (if (egme-parse-npc-list)
-                    (setq egme-random-event-output (concat egme-random-event-output (format "\n        NPC:  %s" (egme-random-list-item (egme-parse-npc-list)))))))
+		;; Make sure it is /not/ a "New NPC" event
+		(if (not (string-match-p "New NPC" egme-random-event-output))
+		    ;; Only change output if NPC list is non-nil
+		    (if (egme-parse-npc-list)
+			(setq egme-random-event-output (concat egme-random-event-output (format "\n        NPC:  %s" (egme-random-list-item (egme-parse-npc-list))))))))
 
             ;; Check if it's a Thread event, add a random Thread from the list - just checks if "thread" is in the current print output variable
             (if (string-match-p "thread" egme-random-event-output)
