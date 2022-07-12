@@ -2,29 +2,41 @@
 
 * EmacsGME - Emacs GameMaster Emulator
 
-EmacsGME v0.2-pre
+EmacsGME v0.2
 
 
 * Introduction
 
-EmacsGME is a GameMaster emulator in the style of MythicGME/CRGE/etc, produced in emacs-lisp for playing solo-roleplaying games entirely within text/org-mode documents.
+EmacsGME is a GameMaster emulator in the style of MythicGME/CRGE/etc, produced in emacs-lisp for playing solo-roleplaying games entirely within org-mode (or plaintext) documents.
 
 As this is my first real use of emacs-lisp, a lot of it is just me trying out different things in a literate-programming style, with my exploratory document eventually due to tangle into an emacs-lisp file for easy addition into any emacs-setup.
 
 
 * Installation
 
-This will have to be manually added for the time being, as I want to flesh out more features before this is submitted to MELPA.
+This will have to be manually added for the time being, this is far from being ready for MELPA - if it ever will be.
 For now, the simplest way to add this to your install is to clone this repo, and place the following into you emacs config:-
 #+BEGIN_SRC
 (load-file "/path/to/egme.el")
 #+END_SRC
 Be sure to put in the correct path for where your copy of ~egme.el~ is saved.
 
+If you are doing any hacking on the main org file, another option is:-
+#+BEGIN_SRC
+(org-babel-load-file "/path/to/egme.org")
+#+END_SRC
+to have it automatically tangled and loaded on startup.
+
 
 * Usage
 
 Usage should be easy to gleam by reading the ~egme.org~ - I have tried to heavily document each function as I write them, not just in how it works but how I hope to extend in the future.
+
+** Output to User
+
+All output is printed into the current buffer, within an org-mode style "GameMaster" block, so that the results can be folded away. On the TODO list is to clone the org "quote" block export styles, so your actual plays can be easily and prettily shown as HTML/PDF/whatever...
+
+Although org-files are the preffered place to play (headings can help define scenes, game info can be hidden in drawers, and more), it can still be used in plain text documents. If not using org-mode, the GameMaster output is surrounded in "braces" which can be modified within ~customize~ in emacs, or by changing the variables ~egme-print-line-start~ and ~egme-print-line-end~. This will be deprecated at some point, eventually the plan is for eGME to become a minor mode dependent on org.
 
 ** Dice Roller
 
@@ -38,21 +50,20 @@ This will accept any numbers for the dice type, and will roll dice with that ran
 Hit return, and the results will be printed into the current buffer like these examples:-
 
 #+BEGIN_QUOTE
-~~|Games Master|~~~~~~~~~
+#+BEGIN_GameMaster
 Rolled:  2d12+8
 Result:  20
-~~~~~~~~~~~~~~~~~~~~~~~~~
+#+END_GameMaster
 #+END_QUOTE
 
 #+BEGIN_QUOTE
-~~|Games Master|~~~~~~~~~
+#+BEGIN_GameMaster
 Rolled:  1d666
 Result:  646
-~~~~~~~~~~~~~~~~~~~~~~~~~
+#+END_GameMaster
 #+END_QUOTE
 
 This function keeps a history of rolls that have been made previoulsy - if you give it no input, then it will reroll the last dice type, or you can scroll back and forth with the up/down keys.
-
 
 ** Yes/No Oracle
 
@@ -61,12 +72,12 @@ Once called, it will ask the user what question is being asked. Here you can typ
 Once a question has been set (or given blank input) then the function asks for probability. This is a sliding scale between +4 and -4, with a description ranging from "Near Certain" to "Near Impossible" - this will affect the likelihood of getting a yes or no, for tweaking probabilities on a per-question case.. Options are chosen by typing the modifier, or scrolling between them using left & right on the keyboard. The deafult option is "0  Even Odds" - just hit enter for a question with unclear probability. An example of this output is:-
 
 #+BEGIN_QUOTE
-~~|Games Master|~~~~~~~~~
+#+BEGIN_GameMaster
    Question:  Is the door locked?
 Probability:  Likely
 ------------
      Answer:  Yes
-~~~~~~~~~~~~~~~~~~~~~~~~~
+#+END_GameMaster
 #+END_QUOTE
 
 In some cases, these yes/no answers are extended with answer modifiers or random events...
@@ -85,12 +96,12 @@ The answers are further modified - in some cases there will be an extremely resp
 An example of that output is:-
 
 #+BEGIN_QUOTE
-~~|Games Master|~~~~~~~~~
+#+BEGIN_GameMaster
    Question:  Does the guard notice me?
 Probability:  Even odds
 ------------
      Answer:  Yes, and...
-~~~~~~~~~~~~~~~~~~~~~~~~~
+#+END_GameMaster
 #+END_QUOTE
 
 An "and..." implies the answer goes beyond the basic. So "Yes, and.." is exceptionally positive, and "No, and..." is exceptionally negative.
@@ -102,28 +113,73 @@ As time goes by, there is an ever-increasing chance of a random event occuring e
 A random event consists of the focus (what/who is affected by the event), and the detail (a random Action & Subject word combined). Example of a random event occuring is:-
 
 #+BEGIN_QUOTE
-~~|Games Master|~~~~~~~~~
+#+BEGIN_GameMaster
    Question:  Is the machine switched on?
 Probability:  Very Unlikely
 ------------
      Answer:  No
 ------------
 Random Event!
-      Focus:  NPC action
+      Focus:  PC Negative
      Detail:  Divide / Jealousy
-~~~~~~~~~~~~~~~~~~~~~~~~~
+#+END_GameMaster
 #+END_QUOTE
 
 The player is left to interpret what these results mean in the context of their game.
 
 The Focus table is based on the random events from [[http://wordmillgames.com/mythic-game-master-emulator.html][Mythic GME]], by Word Mill games. The default Action & Subject lists come from my physical card deck, [[https://quintendo.uk/category/solo-sci-fi-sidekick/][Solo Sci-Fi Sidekick]].
 
+** NPC & Thread lists
 
-** Output to User
+Details of current major NPCs and story threads are also managed within each game file. The data is stored within org drawers at the end of each file, named ~:NPCS:~ and ~:THREADS:~ - these reamin folded to avoid cluttering up what you see. Even in standard text files, if org-mode is on your system the text in these drawers will be made inivisible to you during normal play.
 
-All output is printed into the current buffer, braced by lines highlighting it as Games Master output. If the document that the player is playing in happens to be an org-mode document however, then the Games Master output will be placed into a quote-block. This still makes it clear that it is separate from the game text, but means it can be folded away, and will produce nicer output if using those functions from org-mode.
+Each list has a function to add a new entry to the list, with a default keybind:-
 
-If not using org-mode however, the "braces" around Games Master output can be modified within ~customize~ in emacs, or by changing the variables ~egme-print-line-start~ and ~egme-print-line-end~.
+- C-c C-g n - ~egme-add-npc~
+- C-C C-g t - ~egme-add-thread~
+
+And there are counterparts to delete from the lists - the same bind but with a final capital letter:-
+
+- C-c C-g N - ~egme-delete-npc~
+- C-c C-g T - ~egme-delete-thread~
+
+When adding to a list, input is taken from the minibuffer. When deleting, you chose an option in the minibuffer through ~ido-completing-read~.
+
+These tie into the random event system - if a random event concerns a thread, it will select one at random for the event. Or if a random event concerns an NPC, a random one will be shown (with the exception of the "New NPC" event). For example:-
+
+#+BEGIN_QUOTE
+#+BEGIN_GameMaster
+   Question:  Do they spot me approaching?
+Probability:  Unlikely
+------------
+     Answer:  No
+------------
+Random Event!
+      Focus:  NPC positive
+        NPC:  Henrethia
+     Detail:  Procrastinate / Death
+#+END_GameMaster
+
+#+BEGIN_GameMaster
+   Question:  Is it heavily guarded?
+Probability:  Likely
+------------
+     Answer:  Yes
+------------
+Random Event!
+      Focus:  Move towards thread
+     Thread:  Escape the encampment
+     Detail:  Move / Randomness
+#+END_GameMaster
+#+END_QUOTE
+
+Interpretation of the detail is still up to the player, but can push the game in new and exciting ways.
+
+** Dashboard
+
+With the default keybindes, ~C-C C-g d~ opens the dsahboard buffer. This extra split buffer sits on the right of the game file by default, and shows the current contents of the NPC & thread lists. It will automatically refresh when NPCs/threads are added or deleted, so it can be a handy resource.
+
+This will show more info in the future - current ideas include the current eGME keybinds, last roll results, and more...
 
 ** More Details
 
@@ -133,21 +189,20 @@ The entire system is developed from a pen & paper system based on actual dice ro
 * Changelog
 
 - v0.1 - Initial release
-- v0.2-pre - Added list handling and basic game state display
+- v0.2 - Added list handling and dashboard for basic game-state display
 
 
-* TO-DO List
+* TODO List
 
-The following items are currently on the todo list - I am open to further suggestions of how this can be improved.
+The following items are currently on the TODO list - I am open to further suggestions of how this can be improved.
 
-- +Saving variables between sessions+
-- +Handling a list of NPCs+
-- +Handling a list of threads+
-- +Possibly implement as a minor-mode - with siderbar buffer showing game info (threads/NPCs/etc)+
-- Handle the "New NPC" random event more gracefully
-- Update this README to better reflect the reality of usage
+- [ ] Show keybinds in dashboard
+- [ ] Remove the non-org mode output
+- [ ] Add a random image orcale for extra inspiration (from a user-specified directory)
+- [ ] Convert to a true minor mode, dependent on org
+- [ ] Update this README to better reflect the reality of usage (the Sisyphean task)
 
   
 * Licensing
 
-EmacsGME is licensed under the GPLv2, see included licence file for details.
+EmacsGME is licensed under the GPLv2, see included LICENSE file for details.
