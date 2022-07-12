@@ -49,12 +49,10 @@ After calling, the user is asked to input a dice roll into the mini-buffer. This
 This will accept any numbers for the dice type, and will roll dice with that range of numbers. This is only treated differently when using multiple-6 dice (D66,D666,D6666...) - in those cases, it will roll that many 6-sided dice and combine them for each digit of the result.
 Hit return, and the results will be printed into the current buffer like these examples:-
 
-#+BEGIN_QUOTE
 #+BEGIN_GameMaster
 Rolled:  2d12+8
 Result:  20
 #+END_GameMaster
-#+END_QUOTE
 
 #+BEGIN_QUOTE
 #+BEGIN_GameMaster
@@ -178,7 +176,7 @@ Interpretation of the detail is still up to the player, but can push the game in
 
 ** Dashboard
 
-With the default keybindes, ~C-C C-g d~ opens the dsahboard buffer. This extra split buffer sits on the right of the game file by default, and shows the current contents of the NPC & thread lists. It will automatically refresh when NPCs/threads are added or deleted, so it can be a handy resource.
+With the default keybinds, ~C-C C-g d~ opens the dashboard buffer. This extra split buffer sits on the right of the game file by default, and shows the current contents of the NPC & thread lists. It will automatically refresh when NPCs/threads are added or deleted, so it can be a handy resource.
 
 This will show more info in the future - current ideas include the current eGME keybinds, last roll results, and more...
 
