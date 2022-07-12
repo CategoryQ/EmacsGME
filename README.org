@@ -159,7 +159,8 @@ Random Event!
         NPC:  Henrethia
      Detail:  Procrastinate / Death
 #+END_GameMaster
-
+#+END_QUOTE
+#+BEGIN_QUOTE
 #+BEGIN_GameMaster
    Question:  Is it heavily guarded?
 Probability:  Likely
