@@ -197,11 +197,12 @@ The entire system is developed from a pen & paper system based on actual dice ro
 
 The following items are currently on the TODO list - I am open to further suggestions of how this can be improved.
 
-- [ ] Show keybinds in dashboard
-- [ ] Remove the non-org mode output
-- [ ] Add a random image orcale for extra inspiration (from a user-specified directory)
-- [ ] Convert to a true minor mode, dependent on org
-- [ ] Update this README to better reflect the reality of usage (the Sisyphean task)
+- Show keybinds in dashboard
+- Remove the non-org mode output
+- Add a random image orcale for extra inspiration (from a user-specified directory)
+- Convert to a true minor mode, dependent on org
+- Function to "initialize" a game file - effectively an org-capture template separate from org
+- Update this README to better reflect the reality of usage (the Sisyphean task)
 
   
 * Licensing
