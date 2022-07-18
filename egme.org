@@ -430,7 +430,7 @@ CLOSED: [2021-06-19 Sat 00:39]
 
 This is the core function for output to the user.
 
-Jump to the end of the line, add 2 newlines, open a "GameMaster" block, then the function output (a string taken as an argument), then close the "GameMaster" block. If the current buffer is a "Fundamental" buffer, and in a major mode that /isn't/ org, it will throw an error. Otherwise, it will activate org-mode for this buffer. 
+Jump to the end of the line, add 2 newlines, open a "GameMaster" block, then the function output (a string taken as an argument), then close the "GameMaster" block. If the current buffer is a "Fundamental" buffer, and in a major mode that /isn't/ org, it will throw a message. Otherwise, it will activate org-mode for this buffer. Output is never suppressed.
 
 #+BEGIN_SRC emacs-lisp
 (defun egme-print-output (print-string)
