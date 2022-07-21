@@ -50,10 +50,10 @@ This will accept any numbers for the dice type, and will roll dice with that ran
 Hit return, and the results will be printed into the current buffer like these examples:-
 
 #+BEGIN_QUOTE
-'#+BEGIN_GameMaster
-Rolled:  2d12+8
-Result:  20
-''#+END_GameMaster
+=#+BEGIN_GameMaster=
+=Rolled:  2d12+8=
+=Result:  20=
+=#+END_GameMaster=
 #+END_QUOTE
 
 #+BEGIN_QUOTE
