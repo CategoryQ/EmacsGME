@@ -16,13 +16,13 @@ As this is my first real use of emacs-lisp, a lot of it is just me trying out di
 
 This will have to be manually added for the time being, this is far from being ready for MELPA - if it ever will be.
 For now, the simplest way to add this to your install is to clone this repo, and place the following into you emacs config:-
-#+BEGIN_SRC
+#+BEGIN_SRC org
 (load-file "/path/to/egme.el")
 #+END_SRC
 Be sure to put in the correct path for where your copy of ~egme.el~ is saved.
 
 If you are doing any hacking on the main org file, another option is:-
-#+BEGIN_SRC
+#+BEGIN_SRC org
 (org-babel-load-file "/path/to/egme.org")
 #+END_SRC
 to have it automatically tangled and loaded on startup.
@@ -49,14 +49,14 @@ After calling, the user is asked to input a dice roll into the mini-buffer. This
 This will accept any numbers for the dice type, and will roll dice with that range of numbers. This is only treated differently when using multiple-6 dice (D66,D666,D6666...) - in those cases, it will roll that many 6-sided dice and combine them for each digit of the result.
 Hit return, and the results will be printed into the current buffer like these examples:-
 
-#+BEGIN_SRC
+#+BEGIN_SRC org
 #​+BEGIN_GameMaster
 Rolled:  2d12+8
 Result:  20
 #​+END_GameMaster
 #+END_SRC
 
-#+BEGIN_SRC
+#+BEGIN_SRC org
 #​+BEGIN_GameMaster
 Rolled:  1d666
 Result:  646
@@ -71,7 +71,7 @@ This features is the main driver of solo-roleplaying with EmacsGME, the yes/no o
 Once called, it will ask the user what question is being asked. Here you can type a question into the minibuffer, which will be included with any output - this is optional. It will also scan the current line, and if a question is found it will be used as the initial input.
 Once a question has been set (or given blank input) then the function asks for probability. This is a sliding scale between +4 and -4, with a description ranging from "Near Certain" to "Near Impossible" - this will affect the likelihood of getting a yes or no, for tweaking probabilities on a per-question case.. Options are chosen by typing the modifier, or scrolling between them using left & right on the keyboard. The deafult option is "0  Even Odds" - just hit enter for a question with unclear probability. An example of this output is:-
 
-#+BEGIN_SRC
+#+BEGIN_SRC org
 #​+BEGIN_GameMaster
    Question:  Is the door locked?
 Probability:  Likely
@@ -95,7 +95,7 @@ The answers are further modified - in some cases there will be an extremely resp
 
 An example of that output is:-
 
-#+BEGIN_SRC
+#+BEGIN_SRC org
 #​+BEGIN_GameMaster
    Question:  Does the guard notice me?
 Probability:  Even odds
@@ -112,7 +112,7 @@ Getting "but..." implies a partial success/failure. So "Yes, but..." is partiall
 As time goes by, there is an ever-increasing chance of a random event occuring each time you ask a question. When a random event occurs, it is added to the output of the oracle.
 A random event consists of the focus (what/who is affected by the event), and the detail (a random Action & Subject word combined). Example of a random event occuring is:-
 
-#+BEGIN_SRC
+#+BEGIN_SRC org
 #​+BEGIN_GameMaster
    Question:  Is the machine switched on?
 Probability:  Very Unlikely
@@ -147,7 +147,7 @@ When adding to a list, input is taken from the minibuffer. When deleting, you ch
 
 These tie into the random event system - if a random event concerns a thread, it will select one at random for the event. Or if a random event concerns an NPC, a random one will be shown (with the exception of the "New NPC" event). For example:-
 
-#+BEGIN_SRC
+#+BEGIN_SRC org
 #​+BEGIN_GameMaster
    Question:  Do they spot me approaching?
 Probability:  Unlikely
@@ -160,7 +160,7 @@ Random Event!
      Detail:  Procrastinate / Death
 #​+END_GameMaster
 #+END_SRC
-#+BEGIN_SRC
+#+BEGIN_SRC org
 #​+BEGIN_GameMaster
    Question:  Is it heavily guarded?
 Probability:  Likely
