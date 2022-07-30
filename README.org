@@ -49,19 +49,19 @@ After calling, the user is asked to input a dice roll into the mini-buffer. This
 This will accept any numbers for the dice type, and will roll dice with that range of numbers. This is only treated differently when using multiple-6 dice (D66,D666,D6666...) - in those cases, it will roll that many 6-sided dice and combine them for each digit of the result.
 Hit return, and the results will be printed into the current buffer like these examples:-
 
-#+BEGIN_SRC org
+#+BEGIN_SRC
 #​+BEGIN_GameMaster
 Rolled:  2d12+8
 Result:  20
 #​+END_GameMaster
 #+END_SRC
 
-#+BEGIN_QUOTE
-=#+BEGIN_GameMaster=
-=Rolled:  1d666=
-=Result:  646=
-=#+END_GameMaster=
-#+END_QUOTE
+#+BEGIN_SRC
+#​+BEGIN_GameMaster
+Rolled:  1d666
+Result:  646
+#​+END_GameMaster
+#+END_SRC
 
 This function keeps a history of rolls that have been made previoulsy - if you give it no input, then it will reroll the last dice type, or you can scroll back and forth with the up/down keys.
 
@@ -71,14 +71,14 @@ This features is the main driver of solo-roleplaying with EmacsGME, the yes/no o
 Once called, it will ask the user what question is being asked. Here you can type a question into the minibuffer, which will be included with any output - this is optional. It will also scan the current line, and if a question is found it will be used as the initial input.
 Once a question has been set (or given blank input) then the function asks for probability. This is a sliding scale between +4 and -4, with a description ranging from "Near Certain" to "Near Impossible" - this will affect the likelihood of getting a yes or no, for tweaking probabilities on a per-question case.. Options are chosen by typing the modifier, or scrolling between them using left & right on the keyboard. The deafult option is "0  Even Odds" - just hit enter for a question with unclear probability. An example of this output is:-
 
-#+BEGIN_QUOTE
-=#+BEGIN_GameMaster=
-   =Question:  Is the door locked?=
-=Probability:  Likely=
-=------------=
-     =Answer:  Yes=
-=#+END_GameMaster=
-#+END_QUOTE
+#+BEGIN_SRC
+#​+BEGIN_GameMaster
+   Question:  Is the door locked?
+Probability:  Likely
+------------
+     Answer:  Yes
+#​+END_GameMaster
+#+END_SRC
 
 In some cases, these yes/no answers are extended with answer modifiers or random events...
 
@@ -95,14 +95,14 @@ The answers are further modified - in some cases there will be an extremely resp
 
 An example of that output is:-
 
-#+BEGIN_QUOTE
-=#+BEGIN_GameMaster=
-   =Question:  Does the guard notice me?=
-=Probability:  Even odds=
-=------------=
-     =Answer:  Yes, and...=
-=#+END_GameMaster=
-#+END_QUOTE
+#+BEGIN_SRC
+#​+BEGIN_GameMaster
+   Question:  Does the guard notice me?
+Probability:  Even odds
+------------
+     Answer:  Yes, and...
+#​+END_GameMaster
+#+END_SRC
 
 An "and..." implies the answer goes beyond the basic. So "Yes, and.." is exceptionally positive, and "No, and..." is exceptionally negative.
 Getting "but..." implies a partial success/failure. So "Yes, but..." is partially positive, and "No, but..." is only partially negative.
@@ -112,18 +112,18 @@ Getting "but..." implies a partial success/failure. So "Yes, but..." is partiall
 As time goes by, there is an ever-increasing chance of a random event occuring each time you ask a question. When a random event occurs, it is added to the output of the oracle.
 A random event consists of the focus (what/who is affected by the event), and the detail (a random Action & Subject word combined). Example of a random event occuring is:-
 
-#+BEGIN_QUOTE
-=#+BEGIN_GameMaster=
-   =Question:  Is the machine switched on?=
-=Probability:  Very Unlikely=
-=------------=
-     =Answer:  No=
-=------------=
-=Random Event!=
-      =Focus:  PC Negative=
-     =Detail:  Divide / Jealousy=
-=#+END_GameMaster=
-#+END_QUOTE
+#+BEGIN_SRC
+#​+BEGIN_GameMaster
+   Question:  Is the machine switched on?
+Probability:  Very Unlikely
+------------
+     Answer:  No
+------------
+Random Event!
+      Focus:  PC Negative
+     Detail:  Divide / Jealousy
+#​+END_GameMaster
+#+END_SRC
 
 The player is left to interpret what these results mean in the context of their game.
 
@@ -147,32 +147,32 @@ When adding to a list, input is taken from the minibuffer. When deleting, you ch
 
 These tie into the random event system - if a random event concerns a thread, it will select one at random for the event. Or if a random event concerns an NPC, a random one will be shown (with the exception of the "New NPC" event). For example:-
 
-#+BEGIN_QUOTE
-=#+BEGIN_GameMaster=
-   =Question:  Do they spot me approaching?=
-=Probability:  Unlikely=
-=------------=
-     =Answer:  No=
-=------------=
-=Random Event!=
-      =Focus:  NPC positive=
-        =NPC:  Henrethia=
-     =Detail:  Procrastinate / Death=
-=#+END_GameMaster=
-#+END_QUOTE
-#+BEGIN_QUOTE
-=#+BEGIN_GameMaster=
-   =Question:  Is it heavily guarded?=
-=Probability:  Likely=
-=------------=
-     =Answer:  Yes=
-=------------=
-=Random Event!=
-      =Focus:  Move towards thread=
-     =Thread:  Escape the encampment=
-     =Detail:  Move / Randomness=
-=#+END_GameMaster=
-#+END_QUOTE
+#+BEGIN_SRC
+#​+BEGIN_GameMaster
+   Question:  Do they spot me approaching?
+Probability:  Unlikely
+------------
+     Answer:  No
+------------
+Random Event!
+      Focus:  NPC positive
+        NPC:  Henrethia
+     Detail:  Procrastinate / Death
+#​+END_GameMaster
+#+END_SRC
+#+BEGIN_SRC
+#​+BEGIN_GameMaster
+   Question:  Is it heavily guarded?
+Probability:  Likely
+------------
+     Answer:  Yes
+------------
+Random Event!
+      Focus:  Move towards thread
+     Thread:  Escape the encampment
+     Detail:  Move / Randomness
+#​+END_GameMaster
+#+END_SRC
 
 Interpretation of the detail is still up to the player, but can push the game in new and exciting ways.
 
