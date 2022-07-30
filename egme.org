@@ -48,7 +48,6 @@ The below sets up the group for customize
 
 The below action/subject lists are for random events & detailed questions. The word lists have come from my [[https://quintendo.uk/category/solo-sci-fi-sidekick/][Solo Sci-Fi Sidekick]] cards project.
 
-
 **** Action
 
 #+BEGIN_SRC emacs-lisp
