@@ -198,7 +198,10 @@ The entire system is developed from a pen & paper system based on actual dice ro
 The following items are currently on the TODO list - I am open to further suggestions of how this can be improved.
 
 - Show keybinds in dashboard
-- Remove the non-org mode output
+- Rework dashboard function, so that it toggles the info buffer
+- More game-state info in the dashboard?
+- Add user customization for random event occurances
+- Add random events for new NPD/thread, which also prompts user to update the list
 - Add a random image orcale for extra inspiration (from a user-specified directory)
 - Convert to a true minor mode, dependent on org
 - Function to "initialize" a game file - effectively an org-capture template separate from org

@@ -281,8 +281,7 @@ Below are the planned functions, along with some scratch code testing ideas.
 
 These functions are used internally, to break apart code and help with readablility & reuse
 
-*** DONE Random List Item
-CLOSED: [2021-06-29 Tue 15:35]
+*** Random List Item
 
 This function takes a list as input, and returns a random element. This is used several times so broken out into it's own function.
 
@@ -298,8 +297,7 @@ Will return nil if provided list is nil."
 #+END_SRC
 
 
-*** DONE Getting Dice Input
-CLOSED: [2021-06-16 Wed 16:02]
+*** Getting Dice Input
 
 For dice rolls, we will get user input from the mini-buffer using ~read-string~... Below will ask for a dice roll and set it to the variable ~egme-current-dice~. This function will be non-interactive, so it is only called by other functions, so it can be paired with calculation/printing/etc.
 
@@ -344,8 +342,7 @@ The selected dice can later be returned by evaluating it's name.
 In the case that a dice-roll cannot be parsed, the output will be ~nil~ so it can be easily read in control functions later.
 
 
-*** DONE Calculating dice rolls
-CLOSED: [2021-06-18 Fri 00:18]
+*** Calculating dice rolls
 
 Below is how the dice roll is deconstructed.
 
@@ -424,8 +421,7 @@ Output test:-
 : 12
 
 
-*** DONE GM Printed Output
-CLOSED: [2021-06-19 Sat 00:39]
+*** GM Printed Output
 
 This is the core function for output to the user.
 
@@ -470,19 +466,17 @@ If the current buffer is not an org-mode document, it will check if it is fundam
   t)
 #+END_SRC
 
-**** TODO GameMaster Block
+**** GameMaster Block
 
 I need to find how to make the GameMaster block properly recognised by org, with some way of making it have pretty html export.
 
-*** TODO Random Events
+*** Random Events
 
 The following function will be called from the oracle, and check to see if a random event happened. If so, it will append the details of the random event to ~egme-oracle-output~ to be printed along with the normal outcome of the question. If the random event is NPC or Thread based, a random option from the current lists are displayed. 
 
 Every time a random event is checked for, the variable ~egme-random-counter~ is incremented. This is compared to a 1d20 roll - if the roll is lower than the random counter, then a random event has occured. Any text for the random event is added to the ~egme-oracle-output~ string, then the counter is reset. This has the effect that the more questions that are asked, the more likely a random event is to occur.
 
 I may have to change the comparison roll away from a D20 - may need some fine tuning to get the frequency right
-
-/TODO/ - in the case of NPC/thread events, have  "new NPC/new thread" as an option... Implementation TBA!
 
 #+BEGIN_SRC emacs-lisp
     (defun egme-random-event ()
@@ -539,13 +533,11 @@ This function then returns the random event text, for the calling function to pa
 #+END_SRC
 
 
-*** DONE Org-Drawer Management
-CLOSED: [2022-07-01 Fri 00:42]
+*** Org-Drawer Management
 
 A pair of functions for opening or closing the NPC/Thread list drawers. Open wil only open it if closed, close will only close an open drawer. This avoids any issues with drawers being manually opened by the user, and avoids the ambiguity of just using ~org-cycle~ by itself.
 
-***** DONE Open a drawer
-CLOSED: [2022-06-30 Thu 23:24]
+**** Open a drawer
 
 #+BEGIN_SRC emacs-lisp
 (defun egme-open-org-drawer ()
@@ -560,8 +552,7 @@ Open state is determined by checking if current line is a drawer, and if the tex
     (message "No closed drawer to open.")))
 #+END_SRC
 
-***** DONE Close a drawer
-CLOSED: [2022-07-01 Fri 00:27]
+**** Close a drawer
 
 #+BEGIN_SRC emacs-lisp
 (defun egme-close-org-drawer ()
@@ -579,8 +570,7 @@ Open state is determined by checking if current line is a drawer, and if the tex
 
 ** User-facing functions
 
-*** DONE Rolling Dice
-CLOSED: [2021-06-19 Sat 00:38]
+*** Rolling Dice
 
 This function is how the user is expected to interact with the dice roller (typically via a key-bind). It will call the egme-get-dice command, followed by the egme-calculate-dice command, and then output the info in a human-readable format through ~egme-print-output~ - with a smattering of error-checking along the way.
 
@@ -612,8 +602,7 @@ This function is interactively callable via M-x, and a prime input option for ke
 #+END_SRC
 
 
-*** DONE Yes/No Oracle
-CLOSED: [2021-06-30 Wed 23:11]
+*** Yes/No Oracle
 
 When first ran, this will ask the usser what question they are asking. This can be ignored by just entering no text
 
@@ -701,21 +690,317 @@ The function egme-random-event is also called to see if anything unexpected occu
 #+END_SRC
 
 
-** TODO List Handling
+** List Handling
 
 Several types of lists are stored within the file, for callback at later times. So far, this is just NPCS & Thread lists.
 
-*** TODO Display Dashboard [1/5]
 
-Create a temporary read-only buffer in a split window displaying the current lists. This can become more than just a list dispay, so I have named it such
+*** NPC List Handling
 
-/TODO/
-- [X] force the window to split to the right
-- [ ] make the dashboard function toggle the side buffer
-- [ ] move in file
-- [ ] display main keybinds
-- [ ] add more game state info?
+The NPC list is stored at the end of the file, in an org drawer called "NPCS" - which would look something like:-
 
+:NPCS:
+Alice
+Bob
+Chris
+Dante
+Elvira
+:END:
+
+The contents of this drawer can be easily parsed into a list when needed, and easily found through searching. The function ~save-excursion~ will be used to return the user where they were in the file.
+
+**** Add NPC
+
+This function can either be passed a new character name, or it will ask for user input when a new character is required. It will search the current file backwards for the NPCS drawer, and add the new NPC to the beginning. The drawer will be created at the end of the file if not alread present.
+
+#+BEGIN_SRC emacs-lisp
+(defun egme-add-npc (&optional npc-name)
+  "This function adds an NPC to the current file.
+
+NPCS are stored at the end of the file, under an :NPCS: drawer. It will search backwards from the end of the file for the drawer, and create it if not found. npc-name is then inserted on at the beginning of the drawer."
+
+  (interactive)
+
+  ;; Ask for NPC name if nothing is passed to the function
+  (if npc-name
+      t
+    (setq npc-name (read-string "New NPC name? ")))
+
+  ;; save-excursion so cursor returns to users current position
+  (save-excursion
+    (progn
+      (end-of-buffer)
+      
+      ;; Search backwards for ":NPCS:" 
+      (if (search-backward ":NPCS:" nil t)
+
+	  ;; The drawer has been found, check if npc-name already exists - add if missing, throw an error if it already exists
+	  (if (member npc-name (egme-parse-npc-list))
+	      (user-error "NPC is already in the list")
+	    (progn
+	      (egme-open-org-drawer)
+	      (end-of-line)
+	      (newline)
+	      (insert npc-name)))
+
+	;; The :NPCS: drawer doesn't exist, create it and add the new npc-name
+	(insert (concat "\n:NPCS:\n" npc-name "\n:END:\n")))
+
+      ;; Fold the Drawer closed
+      (search-backward ":NPCS:" nil t)
+      (egme-close-org-drawer)))
+
+  ;; Refresh dispay buffer if open
+  (egme-update-display-buffer)
+  
+  ;; Return the added npc-name
+  npc-name)
+#+END_SRC
+
+**** Parse NPCs to list
+
+This function will find the NPC list within the current file, and return it as a list. If an NPC list does not yet exist, it will return ~nil~ and throw a user error.
+
+#+BEGIN_SRC emacs-lisp :tangle yes :resuls silent
+(defun egme-parse-npc-list ()
+    "This function gets locates the NPC list in the given file, and store all the names in the list egme-npc-list
+
+If the :NPCS: drawer cannot be found, then an error message will be created, and the function returns nil. Otherwise, the generated list will be returned (in addtion to being added to egme-npc-list variable)."
+
+    (setq egme-npc-list nil)
+        
+  (save-excursion
+    (progn
+      (end-of-buffer)
+
+      ;; Find NPC drawer
+      (if (search-backward ":NPCS:" nil t)
+
+	  ;; Drawer found, turn it into a list
+	  (progn
+	    ;; Open drawer before parsing
+	    (egme-open-org-drawer)
+	    (next-line)
+
+	    ;; Loop until end of drawer found
+	    (while (not (string-match "^:END:" (thing-at-point 'line t)))
+	      (progn
+		;; Add current element, minus final character (trailing newline), then move to next
+		(push (substring (thing-at-point 'line t) 0 -1) egme-npc-list)
+		(next-line)))
+
+	    ;; Close the drawer again
+	    (search-backward ":NPCS:" nil t)
+	    (egme-close-org-drawer))
+
+	;; No NPC drawer found
+	(message "No NPC list in current file"))))
+
+  ; Return list contents (or nil if nothing is found)
+  egme-npc-list)
+#+END_SRC
+
+**** Delete NPC
+
+This function will remove an NPC from the list - the parsed list will be provided to the user, a selecion is made, and then that name is removed from the NPCS drawer. The list is then parsed again, and the deleted NPC will no longer be present.
+
+#+BEGIN_SRC emacs-lisp
+(defun egme-delete-npc ()
+  "This function deletes an NPC from the active list.
+
+The NPC list is parsed, and all are offered as options with ido-completing-read. This is then found within the NPC list drawer, and the chosen option is deleted. This function then re-parses and returns the updated list."
+
+  (interactive)
+
+  ;; Check NPC list has been created
+  (if (egme-parse-npc-list)
+      
+      ;; Parse latest NPC list, and get user input for which to delete
+      (setq deleting-npc (ido-completing-read "NPC to delete? " (egme-parse-npc-list)))
+    
+    ;; Throw an error if nothing found
+    (user-error "No NPCs in current file"))
+
+  (save-excursion
+    (progn
+
+      ;; Go to end of buffer, then look backwards for the NPC list and open it
+      (end-of-buffer)
+      (search-backward ":NPCS:" nil t)
+      (egme-open-org-drawer)
+
+      ;; Search forwards for the selected deletion
+      (search-forward deleting-npc nil t)
+      (beginning-of-line)
+
+      ;; Delete line and remove the newline to avoid a blank entry
+      (kill-line)
+      (kill-line)
+
+      ;; Close the NPC drawer
+      (search-backward ":NPCS:" nil t)
+      (egme-close-org-drawer)))
+
+  ;; Refresh dispay buffer if open
+  (egme-update-display-buffer)
+  
+  ;; Return updated list
+  (egme-parse-npc-list))
+#+END_SRC
+
+
+*** Thread List Handling
+
+Much of this will be a copy & paste from the NPC list department, with minor changes.
+
+**** Add Thread
+
+This function can either be passed a new thread descriptor, or it will ask for user input when a new thread is required. It will search the current file backwards for the THREADS drawer, and add the new Thread to the beginning. The drawer will be created at the end of the file if not alread present.
+
+#+BEGIN_SRC emacs-lisp
+(defun egme-add-thread (&optional new-thread)
+  "This function adds a Thread to the current file.
+
+Threads are stored at the end of the file, under an :THREADS: drawer. It will search backwards from the end of the file for the drawer, and create it if not found. new-thread is then inserted on at the beginning of the drawer."
+
+  (interactive)
+
+  ;; Ask for Thread if nothing is passed to the function
+  (if new-thread
+      t
+    (setq new-thread (read-string "New Thread description? ")))
+
+  ;; save-excursion so cursor returns to users current position
+  (save-excursion
+    (progn
+      (end-of-buffer)
+      
+      ;; Search backwards for ":THREADS:" 
+      (if (search-backward ":THREADS:" nil t)
+
+	  ;; The drawer has been found, check if new-thread already exists - add if missing, throw an error if it already exists
+	  (if (member new-thread (egme-parse-thread-list))
+	      (user-error "Thread is already in the list")
+	    (progn
+	      (egme-open-org-drawer)
+	      (end-of-line)
+	      (newline)
+	      (insert new-thread)))
+
+	;; The :THREADS: drawer doesn't exist, create it and add the new-thread
+	(insert (concat "\n:THREADS:\n" new-thread "\n:END:\n")))
+
+      ;; Fold the Drawer closed
+      (search-backward ":THREADS:" nil t)
+      (egme-close-org-drawer)))
+
+  ;; Refresh dispay buffer if open
+  (egme-update-display-buffer)
+  
+  ;; Return the added new-thread
+  new-thread)
+#+END_SRC
+
+**** Parse Thread List
+
+This function will find the Thread list within the current file, and return it as a list. If a Thread list does not yet exist, it will return ~nil~ and throw a user error.
+
+#+BEGIN_SRC emacs-lisp :tangle yes :resuls silent
+(defun egme-parse-thread-list ()
+    "This function gets locates the Thread list in the given file, and store all the items in the list egme-thread-list
+
+If the :THREADS: drawer cannot be found, then an error message will be created, and the function returns nil. Otherwise, the generated list will be returned (in addtion to being added to egme-thread-list variable)."
+
+    (setq egme-thread-list nil)
+        
+  (save-excursion
+    (progn
+      (end-of-buffer)
+
+      ;; Find Thread drawer
+      (if (search-backward ":THREADS:" nil t)
+
+	  ;; Drawer found, turn it into a list
+	  (progn
+	    ;; Open drawer before parsing
+	    (egme-open-org-drawer)
+	    (next-line)
+
+	    ;; Loop until end of drawer found
+	    (while (not (string-match "^:END:" (thing-at-point 'line t)))
+	      (progn
+		;; Add current element, minus final character (trailing newline), then move to next
+		(push (substring (thing-at-point 'line t) 0 -1) egme-thread-list)
+		(next-line)))
+
+	    ;; Close the drawer again
+	    (search-backward ":THREADS:" nil t)
+	    (egme-close-org-drawer))
+
+	;; No THREADS drawer found
+	(message "No Thread list in current file"))))
+
+  ; Return list contents (or nil if nothing is found)
+  egme-thread-list)
+#+END_SRC
+
+**** Delete Thread
+
+This function will remove a Thread from the list - the parsed list will be provided to the user, a selecion is made, and then that selection is removed from the THREADS drawer. The list is then parsed again, and the deleted Thread will no longer be present.
+
+#+BEGIN_SRC emacs-lisp
+(defun egme-delete-thread ()
+  "This function deletes a Thread from the active list.
+
+The Thread list is parsed, and all are offered as options with ido-completing-read. This is then found within the Thread list drawer, and the chosen option is deleted. This function then re-parses and returns the updated list."
+
+  (interactive)
+
+  ;; Check Thread list has been created
+  (if (egme-parse-thread-list)
+      
+      ;; Parse latest Thread list, and get user input for which to delete
+      (setq deleting-thread (ido-completing-read "Thread to delete? " (egme-parse-thread-list)))
+    
+    ;; Throw an error if nothing found
+    (user-error "No Threads in current file"))
+
+  (save-excursion
+    (progn
+
+      ;; Go to end of buffer, then look backwards for the Thread list and open it
+      (end-of-buffer)
+      (search-backward ":THREADS:" nil t)
+      (egme-open-org-drawer)
+
+      ;; Search forwards for the selected deletion
+      (search-forward deleting-thread nil t)
+      (beginning-of-line)
+
+      ;; Delete line and remove the newline to avoid a blank entry
+      (kill-line)
+      (kill-line)
+
+      ;; Close the Thread drawer
+      (search-backward ":THREADS:" nil t)
+      (egme-close-org-drawer)))
+
+  ;; Refresh dispay buffer if open
+  (egme-update-display-buffer)
+  
+  ;; Return updated list
+  (egme-parse-thread-list))
+#+END_SRC
+
+
+
+** Dashboard Control
+
+These functions deal with the dashboard "GameMaster" temporary buffer.
+
+*** Display Dashboard
+
+Create a temporary read-only buffer in a split window displaying the current lists. At present this is just the NPC & thread lists, but may be expanded in future to show more information.
 
 #+begin_SRC emacs-lisp :tangle yes :results silent
   (defun egme-dashboard ()
@@ -797,8 +1082,7 @@ Create a temporary read-only buffer in a split window displaying the current lis
     nil)
 #+END_SRC
 
-*** DONE Update Display Buffer Function
-CLOSED: [2022-07-06 Wed 16:03]
+*** Update Display Buffer Function
 
 This function will be called at the end of any list change operations, and will update the dispay buffer if it is open.
 
@@ -812,313 +1096,8 @@ This is to be called at the end of anything that changes displayed information."
       (egme-dashboard)))
 #+END_SRC
 
-*** DONE NPC List Handling
-CLOSED: [2022-07-04 Mon 22:15]
 
-The NPC list is stored at the end of the file, in an org drawer called "NPCS" - which would look something like:-
-
-:NPCS:
-Alice
-Bob
-Chris
-Dante
-Elvira
-:END:
-
-The contents of this drawer can be easily parsed into a list when needed, and easily found through searching. The function ~save-excursion~ will be used to return the user where they were in the file.
-
-**** DONE Add NPC
-CLOSED: [2022-06-28 Tue 23:49]
-
-This function can either be passed a new character name, or it will ask for user input when a new character is required. It will search the current file backwards for the NPCS drawer, and add the new NPC to the beginning. The drawer will be created at the end of the file if not alread present.
-
-#+BEGIN_SRC emacs-lisp
-(defun egme-add-npc (&optional npc-name)
-  "This function adds an NPC to the current file.
-
-NPCS are stored at the end of the file, under an :NPCS: drawer. It will search backwards from the end of the file for the drawer, and create it if not found. npc-name is then inserted on at the beginning of the drawer."
-
-  (interactive)
-
-  ;; Ask for NPC name if nothing is passed to the function
-  (if npc-name
-      t
-    (setq npc-name (read-string "New NPC name? ")))
-
-  ;; save-excursion so cursor returns to users current position
-  (save-excursion
-    (progn
-      (end-of-buffer)
-      
-      ;; Search backwards for ":NPCS:" 
-      (if (search-backward ":NPCS:" nil t)
-
-	  ;; The drawer has been found, check if npc-name already exists - add if missing, throw an error if it already exists
-	  (if (member npc-name (egme-parse-npc-list))
-	      (user-error "NPC is already in the list")
-	    (progn
-	      (egme-open-org-drawer)
-	      (end-of-line)
-	      (newline)
-	      (insert npc-name)))
-
-	;; The :NPCS: drawer doesn't exist, create it and add the new npc-name
-	(insert (concat "\n:NPCS:\n" npc-name "\n:END:\n")))
-
-      ;; Fold the Drawer closed
-      (search-backward ":NPCS:" nil t)
-      (egme-close-org-drawer)))
-
-  ;; Refresh dispay buffer if open
-  (egme-update-display-buffer)
-  
-  ;; Return the added npc-name
-  npc-name)
-#+END_SRC
-
-**** DONE Parse NPCs to list
-CLOSED: [2022-06-30 Thu 01:07]
-
-This function will find the NPC list within the current file, and return it as a list. If an NPC list does not yet exist, it will return ~nil~ and throw a user error.
-
-#+BEGIN_SRC emacs-lisp :tangle yes :resuls silent
-(defun egme-parse-npc-list ()
-    "This function gets locates the NPC list in the given file, and store all the names in the list egme-npc-list
-
-If the :NPCS: drawer cannot be found, then an error message will be created, and the function returns nil. Otherwise, the generated list will be returned (in addtion to being added to egme-npc-list variable)."
-
-    (setq egme-npc-list nil)
-        
-  (save-excursion
-    (progn
-      (end-of-buffer)
-
-      ;; Find NPC drawer
-      (if (search-backward ":NPCS:" nil t)
-
-	  ;; Drawer found, turn it into a list
-	  (progn
-	    ;; Open drawer before parsing
-	    (egme-open-org-drawer)
-	    (next-line)
-
-	    ;; Loop until end of drawer found
-	    (while (not (string-match "^:END:" (thing-at-point 'line t)))
-	      (progn
-		;; Add current element, minus final character (trailing newline), then move to next
-		(push (substring (thing-at-point 'line t) 0 -1) egme-npc-list)
-		(next-line)))
-
-	    ;; Close the drawer again
-	    (search-backward ":NPCS:" nil t)
-	    (egme-close-org-drawer))
-
-	;; No NPC drawer found
-	(message "No NPC list in current file"))))
-
-  ; Return list contents (or nil if nothing is found)
-  egme-npc-list)
-#+END_SRC
-
-**** DONE Delete NPC
-CLOSED: [2022-07-01 Fri 01:43]
-
-This function will remove an NPC from the list - the parsed list will be provided to the user, a selecion is made, and then that name is removed from the NPCS drawer. The list is then parsed again, and the deleted NPC will no longer be present.
-
-#+BEGIN_SRC emacs-lisp
-(defun egme-delete-npc ()
-  "This function deletes an NPC from the active list.
-
-The NPC list is parsed, and all are offered as options with ido-completing-read. This is then found within the NPC list drawer, and the chosen option is deleted. This function then re-parses and returns the updated list."
-
-  (interactive)
-
-  ;; Check NPC list has been created
-  (if (egme-parse-npc-list)
-      
-      ;; Parse latest NPC list, and get user input for which to delete
-      (setq deleting-npc (ido-completing-read "NPC to delete? " (egme-parse-npc-list)))
-    
-    ;; Throw an error if nothing found
-    (user-error "No NPCs in current file"))
-
-  (save-excursion
-    (progn
-
-      ;; Go to end of buffer, then look backwards for the NPC list and open it
-      (end-of-buffer)
-      (search-backward ":NPCS:" nil t)
-      (egme-open-org-drawer)
-
-      ;; Search forwards for the selected deletion
-      (search-forward deleting-npc nil t)
-      (beginning-of-line)
-
-      ;; Delete line and remove the newline to avoid a blank entry
-      (kill-line)
-      (kill-line)
-
-      ;; Close the NPC drawer
-      (search-backward ":NPCS:" nil t)
-      (egme-close-org-drawer)))
-
-  ;; Refresh dispay buffer if open
-  (egme-update-display-buffer)
-  
-  ;; Return updated list
-  (egme-parse-npc-list))
-#+END_SRC
-
-
-*** DONE Thread List Handling
-CLOSED: [2022-07-04 Mon 22:15]
-
-Much of this will be a copy & paste from the NPC list department, with minor changes.
-
-**** DONE Add Thread
-CLOSED: [2022-07-04 Mon 22:05]
-
-This function can either be passed a new thread descriptor, or it will ask for user input when a new thread is required. It will search the current file backwards for the THREADS drawer, and add the new Thread to the beginning. The drawer will be created at the end of the file if not alread present.
-
-#+BEGIN_SRC emacs-lisp
-(defun egme-add-thread (&optional new-thread)
-  "This function adds a Thread to the current file.
-
-Threads are stored at the end of the file, under an :THREADS: drawer. It will search backwards from the end of the file for the drawer, and create it if not found. new-thread is then inserted on at the beginning of the drawer."
-
-  (interactive)
-
-  ;; Ask for Thread if nothing is passed to the function
-  (if new-thread
-      t
-    (setq new-thread (read-string "New Thread description? ")))
-
-  ;; save-excursion so cursor returns to users current position
-  (save-excursion
-    (progn
-      (end-of-buffer)
-      
-      ;; Search backwards for ":THREADS:" 
-      (if (search-backward ":THREADS:" nil t)
-
-	  ;; The drawer has been found, check if new-thread already exists - add if missing, throw an error if it already exists
-	  (if (member new-thread (egme-parse-thread-list))
-	      (user-error "Thread is already in the list")
-	    (progn
-	      (egme-open-org-drawer)
-	      (end-of-line)
-	      (newline)
-	      (insert new-thread)))
-
-	;; The :THREADS: drawer doesn't exist, create it and add the new-thread
-	(insert (concat "\n:THREADS:\n" new-thread "\n:END:\n")))
-
-      ;; Fold the Drawer closed
-      (search-backward ":THREADS:" nil t)
-      (egme-close-org-drawer)))
-
-  ;; Refresh dispay buffer if open
-  (egme-update-display-buffer)
-  
-  ;; Return the added new-thread
-  new-thread)
-#+END_SRC
-
-**** DONE Parse Thread List
-CLOSED: [2022-07-04 Mon 22:05]
-
-This function will find the Thread list within the current file, and return it as a list. If a Thread list does not yet exist, it will return ~nil~ and throw a user error.
-
-#+BEGIN_SRC emacs-lisp :tangle yes :resuls silent
-(defun egme-parse-thread-list ()
-    "This function gets locates the Thread list in the given file, and store all the items in the list egme-thread-list
-
-If the :THREADS: drawer cannot be found, then an error message will be created, and the function returns nil. Otherwise, the generated list will be returned (in addtion to being added to egme-thread-list variable)."
-
-    (setq egme-thread-list nil)
-        
-  (save-excursion
-    (progn
-      (end-of-buffer)
-
-      ;; Find Thread drawer
-      (if (search-backward ":THREADS:" nil t)
-
-	  ;; Drawer found, turn it into a list
-	  (progn
-	    ;; Open drawer before parsing
-	    (egme-open-org-drawer)
-	    (next-line)
-
-	    ;; Loop until end of drawer found
-	    (while (not (string-match "^:END:" (thing-at-point 'line t)))
-	      (progn
-		;; Add current element, minus final character (trailing newline), then move to next
-		(push (substring (thing-at-point 'line t) 0 -1) egme-thread-list)
-		(next-line)))
-
-	    ;; Close the drawer again
-	    (search-backward ":THREADS:" nil t)
-	    (egme-close-org-drawer))
-
-	;; No THREADS drawer found
-	(message "No Thread list in current file"))))
-
-  ; Return list contents (or nil if nothing is found)
-  egme-thread-list)
-#+END_SRC
-
-**** DONE Delete Thread
-CLOSED: [2022-07-04 Mon 22:14]
-
-This function will remove a Thread from the list - the parsed list will be provided to the user, a selecion is made, and then that selection is removed from the THREADS drawer. The list is then parsed again, and the deleted Thread will no longer be present.
-
-#+BEGIN_SRC emacs-lisp
-(defun egme-delete-thread ()
-  "This function deletes a Thread from the active list.
-
-The Thread list is parsed, and all are offered as options with ido-completing-read. This is then found within the Thread list drawer, and the chosen option is deleted. This function then re-parses and returns the updated list."
-
-  (interactive)
-
-  ;; Check Thread list has been created
-  (if (egme-parse-thread-list)
-      
-      ;; Parse latest Thread list, and get user input for which to delete
-      (setq deleting-thread (ido-completing-read "Thread to delete? " (egme-parse-thread-list)))
-    
-    ;; Throw an error if nothing found
-    (user-error "No Threads in current file"))
-
-  (save-excursion
-    (progn
-
-      ;; Go to end of buffer, then look backwards for the Thread list and open it
-      (end-of-buffer)
-      (search-backward ":THREADS:" nil t)
-      (egme-open-org-drawer)
-
-      ;; Search forwards for the selected deletion
-      (search-forward deleting-thread nil t)
-      (beginning-of-line)
-
-      ;; Delete line and remove the newline to avoid a blank entry
-      (kill-line)
-      (kill-line)
-
-      ;; Close the Thread drawer
-      (search-backward ":THREADS:" nil t)
-      (egme-close-org-drawer)))
-
-  ;; Refresh dispay buffer if open
-  (egme-update-display-buffer)
-  
-  ;; Return updated list
-  (egme-parse-thread-list))
-#+END_SRC
-
-
-* TODO Key map/Key bindings
+* Key map/Key bindings
 
 All default keybindings are set here for the interactive functions. A new map ~egme-map~ is defined and accessed via ~"C-c C-g"~, with all other keybinds under that. 
 
