@@ -7,9 +7,9 @@ EmacsGME v0.2
 
 * Introduction
 
-EmacsGME is a GameMaster emulator in the style of MythicGME/CRGE/etc, implemented in emacs-lisp for playing solo-roleplaying games entirely within org-mode (or plaintext) documents.
+EmacsGME is a GameMaster emulator in the style of MythicGME/CRGE/etc, implemented in emacs-lisp for playing solo-roleplaying games entirely within org-mode (or plain text) documents.
 
-As this is my first real use of emacs-lisp, a lot of it is just me trying out different things in a literate-programming style, with my exploratory document eventually due to tangle into an emacs-lisp file for easy addition into any emacs-setup.
+As this is my first real use of emacs-lisp, a lot of it is just me trying out different things in a literate-programming style, with an explanatory document (that is overly commented) that tangles into an emacs-lisp file for easy addition into any emacs-setup.
 
 
 * Installation
@@ -36,7 +36,7 @@ Usage should be easy to gleam by reading the ~egme.org~ - I have tried to heavil
 
 All output is printed into the current buffer, within an org-mode style "GameMaster" block, so that the results can be folded away. On the TODO list is to clone the org "quote" block export styles, so your actual plays can be easily and prettily shown as HTML/PDF/whatever...
 
-Although org-files are the preffered place to play (headings can help define scenes, game info can be hidden in drawers, and more), it can still be used in plain text documents. If not using org-mode, the GameMaster output is surrounded in "braces" which can be modified within ~customize~ in emacs, or by changing the variables ~egme-print-line-start~ and ~egme-print-line-end~. This will be deprecated at some point, eventually the plan is for eGME to become a minor mode dependent on org.
+Although org-files are the preferred place to play (headings can help define scenes, game info can be hidden in drawers, and more), it can still be used in plain text documents. If not using org-mode, the GameMaster output is surrounded in "braces" which can be modified within ~customize~ in emacs, or by changing the variables ~egme-print-line-start~ and ~egme-print-line-end~. This will be deprecated at some point, eventually the plan is for eGME to become a minor mode dependent on org.
 
 ** Dice Roller
 
@@ -63,13 +63,13 @@ Result:  646
 #​+END_GameMaster
 #+END_SRC
 
-This function keeps a history of rolls that have been made previoulsy - if you give it no input, then it will reroll the last dice type, or you can scroll back and forth with the up/down keys.
+This function keeps a history of rolls that have been made previously - if you give it no input, then it will reroll the last dice type, or you can scroll back and forth with the up/down keys.
 
 ** Yes/No Oracle
 
 This features is the main driver of solo-roleplaying with EmacsGME, the yes/no oracle. This function is named "egme-y-n-oracle", and can be called interactively with "M-x egme-y-n-oracle", or with the default keybind of "C-c C-g q".
 Once called, it will ask the user what question is being asked. Here you can type a question into the minibuffer, which will be included with any output - this is optional. It will also scan the current line, and if a question is found it will be used as the initial input.
-Once a question has been set (or given blank input) then the function asks for probability. This is a sliding scale between +4 and -4, with a description ranging from "Near Certain" to "Near Impossible" - this will affect the likelihood of getting a yes or no, for tweaking probabilities on a per-question case.. Options are chosen by typing the modifier, or scrolling between them using left & right on the keyboard. The deafult option is "0  Even Odds" - just hit enter for a question with unclear probability. An example of this output is:-
+Once a question has been set (or given blank input) then the function asks for probability. This is a sliding scale between +4 and -4, with a description ranging from "Near Certain" to "Near Impossible" - this will affect the likelihood of getting a yes or no, for tweaking probabilities on a per-question case.. Options are chosen by typing the modifier, or scrolling between them using left & right on the keyboard. The default option is "0  Even Odds" - just hit enter for a question with unclear probability. An example of this output is:-
 
 #+BEGIN_SRC org
 #​+BEGIN_GameMaster
@@ -109,8 +109,8 @@ Getting "but..." implies a partial success/failure. So "Yes, but..." is partiall
 
 *** Random Events
 
-As time goes by, there is an ever-increasing chance of a random event occuring each time you ask a question. When a random event occurs, it is added to the output of the oracle.
-A random event consists of the focus (what/who is affected by the event), and the detail (a random Action & Subject word combined). Example of a random event occuring is:-
+As time goes by, there is an ever-increasing chance of a random event occurring each time you ask a question. When a random event occurs, it is added to the output of the oracle.
+A random event consists of the focus (what/who is affected by the event), and the detail (a random Action & Subject word combined). Example of a random event occurring is:-
 
 #+BEGIN_SRC org
 #​+BEGIN_GameMaster
@@ -131,7 +131,7 @@ The Focus table is based on the random events from [[http://wordmillgames.com/my
 
 ** NPC & Thread lists
 
-Details of current major NPCs and story threads are also managed within each game file. The data is stored within org drawers at the end of each file, named ~:NPCS:~ and ~:THREADS:~ - these reamin folded to avoid cluttering up what you see. Even in standard text files, if org-mode is on your system the text in these drawers will be made inivisible to you during normal play.
+Details of current major NPCs and story threads are also managed within each game file. The data is stored within org drawers at the end of each file, named ~:NPCS:~ and ~:THREADS:~ - these remain folded to avoid cluttering up what you see. Even in standard text files, if org-mode is on your system the text in these drawers will be made invisible to you during normal play.
 
 Each list has a function to add a new entry to the list, with a default keybind:-
 
@@ -200,11 +200,11 @@ The following items are currently on the TODO list - I am open to further sugges
 - Show keybinds in dashboard
 - Rework dashboard function, so that it toggles the info buffer
 - More game-state info in the dashboard?
-- Add user customization for random event occurances
-- Add random events for new NPD/thread, which also prompts user to update the list
-- Add a random image orcale for extra inspiration (from a user-specified directory)
+- Add user customization for random event occurrences
+- Add random events for new NPC/thread, which also prompts user to update the list
+- Add a random image oracle for extra inspiration (from a user-specified directory)
 - Convert to a true minor mode, dependent on org
-- Function to "initialize" a game file - effectively an org-capture template separate from org
+- Function to "initialise" a game file - effectively an org-capture template separate from org
 - Update this README to better reflect the reality of usage (the Sisyphean task)
 
   
