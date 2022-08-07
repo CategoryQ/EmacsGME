@@ -128,7 +128,6 @@ The below action/subject lists are for random events & detailed questions. The w
   :group 'egme)
 #+END_SRC
 
-
 **** Subject
 
 #+BEGIN_SRC emacs-lisp
@@ -209,6 +208,21 @@ The below action/subject lists are for random events & detailed questions. The w
   :group 'egme)
 #+END_SRC
 
+*** Random Events
+
+
+These variables effect how the random events are generated.
+
+**** Random Event Threshold
+
+This sets the likelihood of a random event happening.
+
+#+BEGIN_SRC emacs-lisp
+(defcustom egme-random-event-threshold 20
+  "Set the upper limit of questions before a random event happens. Low values mean random events happen more frequently, high values and the are more sporadic. After this many questions a random event will definitely occur."
+  :type 'natnum
+  :group 'egme)
+#+END_SRC
 
 ** Internal Variables
 
@@ -474,15 +488,15 @@ I need to find how to make the GameMaster block properly recognised by org, with
 
 The following function will be called from the oracle, and check to see if a random event happened. If so, it will append the details of the random event to ~egme-oracle-output~ to be printed along with the normal outcome of the question. If the random event is NPC or Thread based, a random option from the current lists are displayed. 
 
-Every time a random event is checked for, the variable ~egme-random-counter~ is incremented. This is compared to a 1d20 roll - if the roll is lower than the random counter, then a random event has occured. Any text for the random event is added to the ~egme-oracle-output~ string, then the counter is reset. This has the effect that the more questions that are asked, the more likely a random event is to occur.
+Every time a random event is checked for, the variable ~egme-random-counter~ is incremented. This is compared to a random number with a limit of ~egme-random-event-threshold~ - if this is lower than the random counter, then a random event has occured. Any text for the random event is added to the ~egme-oracle-output~ string, then the counter is reset. This has the effect that the more questions that are asked, the more likely a random event is to occur.
 
-I may have to change the comparison roll away from a D20 - may need some fine tuning to get the frequency right
+The event threshold defaults to 20 (which seems to have a good balance of random events popping up), but this can be edited by the user with ~customize~ to match their preffered frequency.
 
 #+BEGIN_SRC emacs-lisp
     (defun egme-random-event ()
       "A function for genereating unexpected events.
 
-  When an oracle question is asked, this function is called. It keeps a counter in the variable egme-random-counter, which is incremented easch time this is called. Then a single 1d20 is rolled - if the result is lower than the current egme-random-counter value, then a random event is generated. A focus, action and subject are randomly selected from the lists (egme-random-event-list, egme-action-list, and egme-subject-list respectively). If a random event was generated, the counter is reset to 0.
+  When an oracle question is asked, this function is called. It keeps a counter in the variable egme-random-counter, which is incremented each time this is called. A random number is generated between 0 and the variable egme-random-event-threshold - if the result is lower than the current egme-random-counter value, then a random event is generated. A focus, action and subject are randomly selected from the lists (egme-random-event-list, egme-action-list, and egme-subject-list respectively). If a random event was generated, the counter is reset to 0.
 
 If the chosen event concerns an NPC (ignoring the New NPC event), it will display a random NPC from the current list (if available). Likewise, if the event concerns a thread, it will pick a random one from the list.
 
@@ -494,8 +508,8 @@ This function then returns the random event text, for the calling function to pa
       ;; Clear random event output text
       (setq egme-random-event-output nil)
 
-      ;; Compare the random counter to a d20 roll
-      (if (< (egme-calculate-dice "1d20") egme-random-counter)
+      ;; Generate a random number up to the egme-random-event-threshold, and compare against current counter
+      (if (< (random egme-random-event-threshold) egme-random-counter)
 
           ;; Below batch of steps to take if 
           (progn

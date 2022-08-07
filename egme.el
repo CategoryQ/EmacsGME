@@ -162,6 +162,11 @@
   :type '(repeat string)
   :group 'egme)
 
+(defcustom egme-random-event-threshold 20
+  "Set the upper limit of questions before a random event happens. Low values mean random events happen more frequently, high values and the are more sporadic. After this many questions a random event will definitely occur."
+  :type 'natnum
+  :group 'egme)
+
 (setq egme-dice-history (list))
 
 ;; Standard probability list for ido-completing-read
@@ -309,7 +314,7 @@ If the current buffer is not an org-mode document, it will check if it is fundam
     (defun egme-random-event ()
       "A function for genereating unexpected events.
 
-  When an oracle question is asked, this function is called. It keeps a counter in the variable egme-random-counter, which is incremented easch time this is called. Then a single 1d20 is rolled - if the result is lower than the current egme-random-counter value, then a random event is generated. A focus, action and subject are randomly selected from the lists (egme-random-event-list, egme-action-list, and egme-subject-list respectively). If a random event was generated, the counter is reset to 0.
+  When an oracle question is asked, this function is called. It keeps a counter in the variable egme-random-counter, which is incremented each time this is called. A random number is generated between 0 and the variable egme-random-event-threshold - if the result is lower than the current egme-random-counter value, then a random event is generated. A focus, action and subject are randomly selected from the lists (egme-random-event-list, egme-action-list, and egme-subject-list respectively). If a random event was generated, the counter is reset to 0.
 
 If the chosen event concerns an NPC (ignoring the New NPC event), it will display a random NPC from the current list (if available). Likewise, if the event concerns a thread, it will pick a random one from the list.
 
@@ -321,8 +326,8 @@ This function then returns the random event text, for the calling function to pa
       ;; Clear random event output text
       (setq egme-random-event-output nil)
 
-      ;; Compare the random counter to a d20 roll
-      (if (< (egme-calculate-dice "1d20") egme-random-counter)
+      ;; Generate a random number up to the egme-random-event-threshold, and compare against current counter
+      (if (< (random egme-random-event-threshold) egme-random-counter)
 
           ;; Below batch of steps to take if 
           (progn
@@ -468,92 +473,6 @@ The function egme-random-event is also called to see if anything unexpected occu
 
     ; Send output string to display to user 
     (egme-print-output egme-oracle-output))
-
-  (defun egme-dashboard ()
-    "This function will create a temporary buffer to display current details of the game state.
-
-  At present this is the NPC list & Thread list, formatted 1 item per line.
-
-  This function always returns nil."
-
-    (interactive)
-
-    ;; Update all lists from curent file
-    (egme-parse-npc-list)
-    (egme-parse-thread-list)
-
-    ;; Remember old window split thresholds, and change current to 1 too force a horizontal split
-    (setq egme-old-threshold split-width-threshold)
-    (setq split-width-threshold 1)
-
-    ;; Save location in current buffer
-    (save-excursion
-
-      ;; Create temporary read-only buffer and move to it for output
-      (with-output-to-temp-buffer "GameMaster"
-        (set-buffer "GameMaster")
-
-        ;; Print header
-        (org-mode)
-        (insert "*eGME- Emacs GameMaster Emulator*\n---\n\n\n")
-
-        ;; Check if NPC list is empty
-        (if (not egme-npc-list)
-
-            ;; Output when no list found
-            (insert "No NPCs at present")
-
-          ;; Output when NPCs found
-          (progn
-            (insert "NPCs\n---\n")
-
-            ;; Loop through NPC list
-            (while egme-npc-list
-
-              ;; Pop the list, using each item as output followed by newline
-              (insert (pop egme-npc-list))
-              (newline))))
-
-        (newline)
-        (newline)
-
-        ;; Check if Thread list is empty
-        (if (not egme-thread-list)
-
-            ;; Output when no list found
-            (insert "No Threads at present")
-
-          ;; Output when Threads found
-          (progn
-            (insert "Threads\n---\n")
-
-            ;; Loop through Thread list
-            (while egme-thread-list
-
-              ;; Pop the list, using each item as output followed by newline
-              (insert (pop egme-thread-list))
-              (newline)))))
-
-      ;; Switch to the new window, temporarily alow horizontal changes, and shrink it to fit the contents
-      (other-window 1)
-      (set-variable 'fit-window-to-buffer-horizontally 1)
-      (fit-window-to-buffer)
-      ;; Make it a bit bigger because it was shrinking too much...
-      (enlarge-window-horizontally 7)
-      (other-window 1))
-
-    ;; Return to original split settings
-    (setq split-width-threshold egme-old-threshold)
-
-    nil)
-
-(defun egme-update-display-buffer ()
-  "Simple function to reopen the game-state display if it is visible.
-
-This is to be called at the end of anything that changes displayed information."
-
-  (if (get-buffer-window "GameMaster")
-      (egme-dashboard)))
 
 (defun egme-add-npc (&optional npc-name)
   "This function adds an NPC to the current file.
@@ -796,6 +715,92 @@ The Thread list is parsed, and all are offered as options with ido-completing-re
   
   ;; Return updated list
   (egme-parse-thread-list))
+
+  (defun egme-dashboard ()
+    "This function will create a temporary buffer to display current details of the game state.
+
+  At present this is the NPC list & Thread list, formatted 1 item per line.
+
+  This function always returns nil."
+
+    (interactive)
+
+    ;; Update all lists from curent file
+    (egme-parse-npc-list)
+    (egme-parse-thread-list)
+
+    ;; Remember old window split thresholds, and change current to 1 too force a horizontal split
+    (setq egme-old-threshold split-width-threshold)
+    (setq split-width-threshold 1)
+
+    ;; Save location in current buffer
+    (save-excursion
+
+      ;; Create temporary read-only buffer and move to it for output
+      (with-output-to-temp-buffer "GameMaster"
+        (set-buffer "GameMaster")
+
+        ;; Print header
+        (org-mode)
+        (insert "*eGME- Emacs GameMaster Emulator*\n---\n\n\n")
+
+        ;; Check if NPC list is empty
+        (if (not egme-npc-list)
+
+            ;; Output when no list found
+            (insert "No NPCs at present")
+
+          ;; Output when NPCs found
+          (progn
+            (insert "NPCs\n---\n")
+
+            ;; Loop through NPC list
+            (while egme-npc-list
+
+              ;; Pop the list, using each item as output followed by newline
+              (insert (pop egme-npc-list))
+              (newline))))
+
+        (newline)
+        (newline)
+
+        ;; Check if Thread list is empty
+        (if (not egme-thread-list)
+
+            ;; Output when no list found
+            (insert "No Threads at present")
+
+          ;; Output when Threads found
+          (progn
+            (insert "Threads\n---\n")
+
+            ;; Loop through Thread list
+            (while egme-thread-list
+
+              ;; Pop the list, using each item as output followed by newline
+              (insert (pop egme-thread-list))
+              (newline)))))
+
+      ;; Switch to the new window, temporarily alow horizontal changes, and shrink it to fit the contents
+      (other-window 1)
+      (set-variable 'fit-window-to-buffer-horizontally 1)
+      (fit-window-to-buffer)
+      ;; Make it a bit bigger because it was shrinking too much...
+      (enlarge-window-horizontally 7)
+      (other-window 1))
+
+    ;; Return to original split settings
+    (setq split-width-threshold egme-old-threshold)
+
+    nil)
+
+(defun egme-update-display-buffer ()
+  "Simple function to reopen the game-state display if it is visible.
+
+This is to be called at the end of anything that changes displayed information."
+
+  (if (get-buffer-window "GameMaster")
+      (egme-dashboard)))
 
 (define-prefix-command 'egme-map)
 (define-key mode-specific-map (kbd "C-g") 'egme-map)

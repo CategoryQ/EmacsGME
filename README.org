@@ -125,6 +125,8 @@ Random Event!
 #​+END_GameMaster
 #+END_SRC
 
+The likelihood of an event happening can be set by the user, through the variable ~egme-random-event-threshold~, which can is available through the ~customize~ system.
+
 The player is left to interpret what these results mean in the context of their game.
 
 The Focus table is based on the random events from [[http://wordmillgames.com/mythic-game-master-emulator.html][Mythic GME]], by Word Mill games. The default Action & Subject lists come from my physical card deck, [[https://quintendo.uk/category/solo-sci-fi-sidekick/][Solo Sci-Fi Sidekick]].
@@ -200,7 +202,7 @@ The following items are currently on the TODO list - I am open to further sugges
 - Show keybinds in dashboard
 - Rework dashboard function, so that it toggles the info buffer
 - More game-state info in the dashboard?
-- Add user customization for random event occurrences
+- [DONE] +Add user customization for random event occurrences+
 - Add random events for new NPC/thread, which also prompts user to update the list
 - Add a random image oracle for extra inspiration (from a user-specified directory)
 - Convert to a true minor mode, dependent on org
