@@ -34,9 +34,9 @@ Usage should be easy to gleam by reading the ~egme.org~ - I have tried to heavil
 
 ** Output to User
 
-All output is printed into the current buffer, within an org-mode style "GameMaster" block, so that the results can be folded away. On the TODO list is to clone the org "quote" block export styles, so your actual plays can be easily and prettily shown as HTML/PDF/whatever...
+All output is printed into the current buffer, within an org-mode style "GameMaster" block, so that the results can be folded away. On the TODO list is to add proper export styles, so your actual plays can be easily and prettily shown as HTML/PDF/whatever...
 
-Although org-files are the preferred place to play (headings can help define scenes, game info can be hidden in drawers, and more), it can still be used in plain text documents. If not using org-mode, the GameMaster output is surrounded in "braces" which can be modified within ~customize~ in emacs, or by changing the variables ~egme-print-line-start~ and ~egme-print-line-end~. This will be deprecated at some point, eventually the plan is for eGME to become a minor mode dependent on org.
+org-files are the preferred place to play - headings can help define scenes, game info can be hidden in drawers, and more. If not using org-mode, then org-mode will be enabled in the game buffer whenever output is written.
 
 ** Dice Roller
 
@@ -206,7 +206,7 @@ The following items are currently on the TODO list - I am open to further sugges
 - Add random events for new NPC/thread, which also prompts user to update the list
 - Add a random image oracle for extra inspiration (from a user-specified directory)
 - Convert to a true minor mode, dependent on org
-- Function to "initialise" a game file - effectively an org-capture template separate from org
+- Function to "initialise" a game file - set title/description/lists/properties - and styling info for the GameMaster block for exporting
 - Update this README to better reflect the reality of usage (the Sisyphean task)
 
   
