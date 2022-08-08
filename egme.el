@@ -162,7 +162,7 @@
   :type '(repeat string)
   :group 'egme)
 
-(defcustom egme-random-event-threshold 20
+(defcustom egme--random-event-threshold 20
   "Set the upper limit of questions before a random event happens. Low values mean random events happen more frequently, high values and the are more sporadic. After this many questions a random event will definitely occur."
   :type 'natnum
   :group 'egme)
@@ -183,7 +183,7 @@
 
 (setq egme-random-counter 0)
 
-(setq egme-random-event-list (list
+(setq egme--random-event-list (list
 			      "Remote event"
 			      "NPC action"
 			      "New NPC appears"
@@ -198,7 +198,7 @@
 (setq egme-npc-list (list))
 (setq egme-thread-list (list))
 
-(defun egme-random-list-item (list-to-pick-from)
+(defun egme--random-list-item (list-to-pick-from)
   "This function takes a list as an argument, and returns a random element from within that list.
 
 Will return nil if provided list is nil."
@@ -207,7 +207,7 @@ Will return nil if provided list is nil."
     (list-to-pick-from (nth (random (length list-to-pick-from)) list-to-pick-from))
     (t nil)))
 
-  (defun egme-get-dice ()
+  (defun egme--get-dice ()
     "Get the required dice-roll from user input on the mini-buffer. Dice rolls to be expected in the usual [number]D[dice-type][modifier] format used by RPGs, for example '2D6' for 2 six-sided dice, or '3d8+2' for 3 eight-sided dice, with 2 added to the result. If the format is given without number (for example 'd100'), then it is assume to be a single dice being rolled.
 
 If no input is given, then it will return the last dice rolled. A full history of rolls is stored in 'egme-dice-history', accessible via the arrow keys when asked for input.
@@ -227,7 +227,7 @@ Returns the dice-type, which is also stored in the variable egme-current-dice - 
     (when (string-match "[1-9][0-9]?[dD][1-9][0-9]*\\([+-][0-9]+\\)?" egme-current-dice)
       (setq egme-current-dice (match-string 0 egme-current-dice))))
 
-(defun egme-calculate-dice (&optional dice-roll)
+(defun egme--calculate-dice (&optional dice-roll)
   "Calculates the current dice roll. If called alone, roll the variable egme-current-dice. If argument DICE-ROLL is provided, roll that - it must be in RPG dice notation ('1d20', '3d10+8', '2d6-4', etc). Return the result of the dice roll, and store in the variable egme-roll-result.
 
 Current roll is broken down into the following variable for calculating:-
@@ -274,7 +274,7 @@ This function loops for the quantity of dice, summing up random numbers for the 
   ;; Add the modifier to the result, for the final roll
   (setq egme-roll-result (+ egme-roll-result egme-current-dice-modifier)))
 
-(defun egme-print-output (print-string)
+(defun egme--print-output (print-string)
   "This function takes a string in as an argument, and prints it's output into the current buffer, within a GameMaster org block.
 
 If the current buffer is not an org-mode document, it will check if it is fundamental. If it is, org-mode will be activated, else it will throw an error stating which major-mode is currently active. It will still print output regardless."
@@ -311,10 +311,10 @@ If the current buffer is not an org-mode document, it will check if it is fundam
 
   t)
 
-    (defun egme-random-event ()
+    (defun egme--random-event ()
       "A function for genereating unexpected events.
 
-  When an oracle question is asked, this function is called. It keeps a counter in the variable egme-random-counter, which is incremented each time this is called. A random number is generated between 0 and the variable egme-random-event-threshold - if the result is lower than the current egme-random-counter value, then a random event is generated. A focus, action and subject are randomly selected from the lists (egme-random-event-list, egme-action-list, and egme-subject-list respectively). If a random event was generated, the counter is reset to 0.
+  When an oracle question is asked, this function is called. It keeps a counter in the variable egme-random-counter, which is incremented each time this is called. A random number is generated between 0 and the variable egme--random-event-threshold - if the result is lower than the current egme-random-counter value, then a random event is generated. A focus, action and subject are randomly selected from the lists (egme--random-event-list, egme-action-list, and egme-subject-list respectively). If a random event was generated, the counter is reset to 0.
 
 If the chosen event concerns an NPC (ignoring the New NPC event), it will display a random NPC from the current list (if available). Likewise, if the event concerns a thread, it will pick a random one from the list.
 
@@ -324,46 +324,46 @@ This function then returns the random event text, for the calling function to pa
       (setq egme-random-counter (1+ egme-random-counter))
 
       ;; Clear random event output text
-      (setq egme-random-event-output nil)
+      (setq egme--random-event-output nil)
 
-      ;; Generate a random number up to the egme-random-event-threshold, and compare against current counter
-      (if (< (random egme-random-event-threshold) egme-random-counter)
+      ;; Generate a random number up to the egme--random-event-threshold, and compare against current counter
+      (if (< (random egme--random-event-threshold) egme-random-counter)
 
           ;; Below batch of steps to take if 
           (progn
             ;; Announce the event
-            (setq egme-random-event-output "\n------------\nRandom Event!")
+            (setq egme--random-event-output "\n------------\nRandom Event!")
 
             ;; Pick random event from the random event focus list
-            (setq egme-random-event-output (concat egme-random-event-output (format "\n      Focus:  %s" (egme-random-list-item egme-random-event-list))))
+            (setq egme--random-event-output (concat egme--random-event-output (format "\n      Focus:  %s" (egme--random-list-item egme--random-event-list))))
 
             ;; Check if it's an NPC event
-            (if (string-match-p "NPC" egme-random-event-output)
+            (if (string-match-p "NPC" egme--random-event-output)
 		;; Make sure it is /not/ a "New NPC" event
-		(if (not (string-match-p "New NPC" egme-random-event-output))
+		(if (not (string-match-p "New NPC" egme--random-event-output))
 		    ;; Only change output if NPC list is non-nil
-		    (if (egme-parse-npc-list)
-			(setq egme-random-event-output (concat egme-random-event-output (format "\n        NPC:  %s" (egme-random-list-item (egme-parse-npc-list))))))))
+		    (if (egme--parse-npc-list)
+			(setq egme--random-event-output (concat egme--random-event-output (format "\n        NPC:  %s" (egme--random-list-item (egme--parse-npc-list))))))))
 
             ;; Check if it's a Thread event, add a random Thread from the list - just checks if "thread" is in the current print output variable
-            (if (string-match-p "thread" egme-random-event-output)
+            (if (string-match-p "thread" egme--random-event-output)
                 ;; Only change output if Thread list is non-nil
-                (if (egme-parse-thread-list)
-                    (setq egme-random-event-output (concat egme-random-event-output (format "\n     Thread:  %s" (egme-random-list-item (egme-parse-thread-list)))))))
+                (if (egme--parse-thread-list)
+                    (setq egme--random-event-output (concat egme--random-event-output (format "\n     Thread:  %s" (egme--random-list-item (egme--parse-thread-list)))))))
 
             ;; Add event details
-            (setq egme-random-event-output (concat egme-random-event-output (format "\n     Detail:  %s" (egme-random-list-item egme-action-list))(format " / %s" (egme-random-list-item egme-subject-list))))
+            (setq egme--random-event-output (concat egme--random-event-output (format "\n     Detail:  %s" (egme--random-list-item egme-action-list))(format " / %s" (egme--random-list-item egme-subject-list))))
 
             ;; Reset the random counter
             (setq egme-random-counter 0)
 
             ;; Return text output
-            egme-random-event-output)
+            egme--random-event-output)
 
         ;; Return nil if no event found
         nil))
 
-(defun egme-open-org-drawer ()
+(defun egme--open-org-drawer ()
   "This function will open an org-mode drawer on the current line, if it is currently closed.
 
 Open state is determined by checking if current line is a drawer, and if the text at the end of the line is visible. If it is invisible, open the drawer with org-cycle."
@@ -374,7 +374,7 @@ Open state is determined by checking if current line is a drawer, and if the tex
       (org-cycle)
     (message "No closed drawer to open.")))
 
-(defun egme-close-org-drawer ()
+(defun egme--close-org-drawer ()
   "This function will close an org-mode drawer on the current line, if it is currently open.
 
 Open state is determined by checking if current line is a drawer, and if the text at the end of the line is visible. If it is not invisible, close the drawer with org-cycle."
@@ -388,24 +388,24 @@ Open state is determined by checking if current line is a drawer, and if the tex
 (defun egme-roll-dice ()
   "This function is for a user to generate the results from a dice roll, and output them into the current buffer.
 
-egme-get-dice is called to get user input, egme-calculate dice is used to generate the result, and egme-print-output is used to place this into the current buffer, creating new lines below the point.
+egme--get-dice is called to get user input, egme-calculate dice is used to generate the result, and egme--print-output is used to place this into the current buffer, creating new lines below the point.
 
 This function is interactively callable via M-x, and a prime input option for key-binding."
   ; Let user call via M-x
   (interactive)
 
   ; Get dice size from user
-  (egme-get-dice)
+  (egme--get-dice)
 
   ; Check dice input was correct
   (if egme-current-dice
     ; If valid then calculate result
-    (egme-calculate-dice)
+    (egme--calculate-dice)
     ; Else drop an error message and exit
     (user-error "Could not parse dice roll"))
 
   ; Print results
-  (egme-print-output (concat (format "Rolled:  %s" egme-current-dice) (format "\nResult:  %s" egme-roll-result)))
+  (egme--print-output (concat (format "Rolled:  %s" egme-current-dice) (format "\nResult:  %s" egme-roll-result)))
   egme-roll-result)
 
   (defun egme-y-n-oracle ()
@@ -415,7 +415,7 @@ The user will be asked to input a question - if the end of the current line is p
 Next, the user will be asked for the likelihood of this result. These options are stored in the list egme-probability-list, and selected via ido-completing-read. Each option is a modifier between -4 and +4, along with a basic description of the probability. This basic description will be printed along with the results.
 The answer is generated by rolling 1D10 and applying the chosen modifier, any result of a 6+ will be a 'Yes', anything else a 'No'. A D6 is also rolled, to see if it is an extreme answer - on a 1 it is a minor result (', but...'), and on a 2 it is a major result (', and...').
 
-The function egme-random-event is also called to see if anything unexpected occurs - any change will be added to the variable egme-oracle-output before it gets passed on for user output."
+The function egme--random-event is also called to see if anything unexpected occurs - any change will be added to the variable egme-oracle-output before it gets passed on for user output."
     (interactive)
 
     ; Reset some variables
@@ -438,8 +438,8 @@ The function egme-random-event is also called to see if anything unexpected occu
     (setq egme-current-probability-modifier (match-string 0 egme-current-probability-choice))
     
     ; Roll dice, apply modifier
-    (setq egme-oracle-answer-roll (+ (egme-calculate-dice "1d10") (string-to-number egme-current-probability-modifier)))
-    (setq egme-oracle-answer-modifier (egme-calculate-dice "1d6"))
+    (setq egme-oracle-answer-roll (+ (egme--calculate-dice "1d10") (string-to-number egme-current-probability-modifier)))
+    (setq egme-oracle-answer-modifier (egme--calculate-dice "1d6"))
 
     ; Convert dice rolls into result text - check if modified oracle roll is 6+ ('Yes')
     (if (>= egme-oracle-answer-roll 6)
@@ -469,10 +469,10 @@ The function egme-random-event is also called to see if anything unexpected occu
     (setq egme-oracle-output (concat egme-oracle-output (format "Probability:  %s\n------------" egme-probability-text) (format "\n     Answer:  %s" egme-oracle-answer)))
 
     ; Check for Random events, add any text to output
-    (setq egme-oracle-output (concat egme-oracle-output (egme-random-event)))
+    (setq egme-oracle-output (concat egme-oracle-output (egme--random-event)))
 
     ; Send output string to display to user 
-    (egme-print-output egme-oracle-output))
+    (egme--print-output egme-oracle-output))
 
 (defun egme-add-npc (&optional npc-name)
   "This function adds an NPC to the current file.
@@ -495,10 +495,10 @@ NPCS are stored at the end of the file, under an :NPCS: drawer. It will search b
       (if (search-backward ":NPCS:" nil t)
 
 	  ;; The drawer has been found, check if npc-name already exists - add if missing, throw an error if it already exists
-	  (if (member npc-name (egme-parse-npc-list))
+	  (if (member npc-name (egme--parse-npc-list))
 	      (user-error "NPC is already in the list")
 	    (progn
-	      (egme-open-org-drawer)
+	      (egme--open-org-drawer)
 	      (end-of-line)
 	      (newline)
 	      (insert npc-name)))
@@ -508,15 +508,15 @@ NPCS are stored at the end of the file, under an :NPCS: drawer. It will search b
 
       ;; Fold the Drawer closed
       (search-backward ":NPCS:" nil t)
-      (egme-close-org-drawer)))
+      (egme--close-org-drawer)))
 
   ;; Refresh dispay buffer if open
-  (egme-update-display-buffer)
+  (egme--update-display-buffer)
   
   ;; Return the added npc-name
   npc-name)
 
-(defun egme-parse-npc-list ()
+(defun egme--parse-npc-list ()
     "This function gets locates the NPC list in the given file, and store all the names in the list egme-npc-list
 
 If the :NPCS: drawer cannot be found, then an error message will be created, and the function returns nil. Otherwise, the generated list will be returned (in addtion to being added to egme-npc-list variable)."
@@ -533,7 +533,7 @@ If the :NPCS: drawer cannot be found, then an error message will be created, and
 	  ;; Drawer found, turn it into a list
 	  (progn
 	    ;; Open drawer before parsing
-	    (egme-open-org-drawer)
+	    (egme--open-org-drawer)
 	    (next-line)
 
 	    ;; Loop until end of drawer found
@@ -545,7 +545,7 @@ If the :NPCS: drawer cannot be found, then an error message will be created, and
 
 	    ;; Close the drawer again
 	    (search-backward ":NPCS:" nil t)
-	    (egme-close-org-drawer))
+	    (egme--close-org-drawer))
 
 	;; No NPC drawer found
 	(message "No NPC list in current file"))))
@@ -561,10 +561,10 @@ The NPC list is parsed, and all are offered as options with ido-completing-read.
   (interactive)
 
   ;; Check NPC list has been created
-  (if (egme-parse-npc-list)
+  (if (egme--parse-npc-list)
       
       ;; Parse latest NPC list, and get user input for which to delete
-      (setq deleting-npc (ido-completing-read "NPC to delete? " (egme-parse-npc-list)))
+      (setq deleting-npc (ido-completing-read "NPC to delete? " (egme--parse-npc-list)))
     
     ;; Throw an error if nothing found
     (user-error "No NPCs in current file"))
@@ -575,7 +575,7 @@ The NPC list is parsed, and all are offered as options with ido-completing-read.
       ;; Go to end of buffer, then look backwards for the NPC list and open it
       (end-of-buffer)
       (search-backward ":NPCS:" nil t)
-      (egme-open-org-drawer)
+      (egme--open-org-drawer)
 
       ;; Search forwards for the selected deletion
       (search-forward deleting-npc nil t)
@@ -587,13 +587,13 @@ The NPC list is parsed, and all are offered as options with ido-completing-read.
 
       ;; Close the NPC drawer
       (search-backward ":NPCS:" nil t)
-      (egme-close-org-drawer)))
+      (egme--close-org-drawer)))
 
   ;; Refresh dispay buffer if open
-  (egme-update-display-buffer)
+  (egme--update-display-buffer)
   
   ;; Return updated list
-  (egme-parse-npc-list))
+  (egme--parse-npc-list))
 
 (defun egme-add-thread (&optional new-thread)
   "This function adds a Thread to the current file.
@@ -616,10 +616,10 @@ Threads are stored at the end of the file, under an :THREADS: drawer. It will se
       (if (search-backward ":THREADS:" nil t)
 
 	  ;; The drawer has been found, check if new-thread already exists - add if missing, throw an error if it already exists
-	  (if (member new-thread (egme-parse-thread-list))
+	  (if (member new-thread (egme--parse-thread-list))
 	      (user-error "Thread is already in the list")
 	    (progn
-	      (egme-open-org-drawer)
+	      (egme--open-org-drawer)
 	      (end-of-line)
 	      (newline)
 	      (insert new-thread)))
@@ -629,15 +629,15 @@ Threads are stored at the end of the file, under an :THREADS: drawer. It will se
 
       ;; Fold the Drawer closed
       (search-backward ":THREADS:" nil t)
-      (egme-close-org-drawer)))
+      (egme--close-org-drawer)))
 
   ;; Refresh dispay buffer if open
-  (egme-update-display-buffer)
+  (egme--update-display-buffer)
   
   ;; Return the added new-thread
   new-thread)
 
-(defun egme-parse-thread-list ()
+(defun egme--parse-thread-list ()
     "This function gets locates the Thread list in the given file, and store all the items in the list egme-thread-list
 
 If the :THREADS: drawer cannot be found, then an error message will be created, and the function returns nil. Otherwise, the generated list will be returned (in addtion to being added to egme-thread-list variable)."
@@ -654,7 +654,7 @@ If the :THREADS: drawer cannot be found, then an error message will be created, 
 	  ;; Drawer found, turn it into a list
 	  (progn
 	    ;; Open drawer before parsing
-	    (egme-open-org-drawer)
+	    (egme--open-org-drawer)
 	    (next-line)
 
 	    ;; Loop until end of drawer found
@@ -666,7 +666,7 @@ If the :THREADS: drawer cannot be found, then an error message will be created, 
 
 	    ;; Close the drawer again
 	    (search-backward ":THREADS:" nil t)
-	    (egme-close-org-drawer))
+	    (egme--close-org-drawer))
 
 	;; No THREADS drawer found
 	(message "No Thread list in current file"))))
@@ -682,10 +682,10 @@ The Thread list is parsed, and all are offered as options with ido-completing-re
   (interactive)
 
   ;; Check Thread list has been created
-  (if (egme-parse-thread-list)
+  (if (egme--parse-thread-list)
       
       ;; Parse latest Thread list, and get user input for which to delete
-      (setq deleting-thread (ido-completing-read "Thread to delete? " (egme-parse-thread-list)))
+      (setq deleting-thread (ido-completing-read "Thread to delete? " (egme--parse-thread-list)))
     
     ;; Throw an error if nothing found
     (user-error "No Threads in current file"))
@@ -696,7 +696,7 @@ The Thread list is parsed, and all are offered as options with ido-completing-re
       ;; Go to end of buffer, then look backwards for the Thread list and open it
       (end-of-buffer)
       (search-backward ":THREADS:" nil t)
-      (egme-open-org-drawer)
+      (egme--open-org-drawer)
 
       ;; Search forwards for the selected deletion
       (search-forward deleting-thread nil t)
@@ -708,13 +708,13 @@ The Thread list is parsed, and all are offered as options with ido-completing-re
 
       ;; Close the Thread drawer
       (search-backward ":THREADS:" nil t)
-      (egme-close-org-drawer)))
+      (egme--close-org-drawer)))
 
   ;; Refresh dispay buffer if open
-  (egme-update-display-buffer)
+  (egme--update-display-buffer)
   
   ;; Return updated list
-  (egme-parse-thread-list))
+  (egme--parse-thread-list))
 
   (defun egme-dashboard ()
     "This function will create a temporary buffer to display current details of the game state.
@@ -726,8 +726,8 @@ The Thread list is parsed, and all are offered as options with ido-completing-re
     (interactive)
 
     ;; Update all lists from curent file
-    (egme-parse-npc-list)
-    (egme-parse-thread-list)
+    (egme--parse-npc-list)
+    (egme--parse-thread-list)
 
     ;; Remember old window split thresholds, and change current to 1 too force a horizontal split
     (setq egme-old-threshold split-width-threshold)
@@ -794,7 +794,7 @@ The Thread list is parsed, and all are offered as options with ido-completing-re
 
     nil)
 
-(defun egme-update-display-buffer ()
+(defun egme--update-display-buffer ()
   "Simple function to reopen the game-state display if it is visible.
 
 This is to be called at the end of anything that changes displayed information."
