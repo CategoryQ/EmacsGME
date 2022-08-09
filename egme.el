@@ -406,6 +406,10 @@ This function is interactively callable via M-x, and a prime input option for ke
 
   ; Print results
   (egme--print-output (concat (format "Rolled:  %s" egme-current-dice) (format "\nResult:  %s" egme-roll-result)))
+
+  ;; Update dashboard
+  (egme--update-display-buffer)
+  
   egme-roll-result)
 
   (defun egme-y-n-oracle ()
@@ -719,7 +723,7 @@ The Thread list is parsed, and all are offered as options with ido-completing-re
   (defun egme-dashboard ()
     "This function will create a temporary buffer to display current details of the game state.
 
-  At present this is the NPC list & Thread list, formatted 1 item per line.
+  At present this is the NPC list & Thread list (formatted 1 item per line), and the results of the last dice roll.
 
   This function always returns nil."
 
@@ -763,6 +767,7 @@ The Thread list is parsed, and all are offered as options with ido-completing-re
 
         (newline)
         (newline)
+	
 
         ;; Check if Thread list is empty
         (if (not egme-thread-list)
@@ -779,7 +784,12 @@ The Thread list is parsed, and all are offered as options with ido-completing-re
 
               ;; Pop the list, using each item as output followed by newline
               (insert (pop egme-thread-list))
-              (newline)))))
+              (newline))
+
+	    
+	    ;; Insert last dice roll info
+	    (insert "\n\nLast Dice Roll\n---\n")
+	    (insert (concat (format "  Roll: %s" egme-current-dice) (format "\nResult: %s" egme-roll-result))))))
 
       ;; Switch to the new window, temporarily alow horizontal changes, and shrink it to fit the contents
       (other-window 1)
@@ -802,6 +812,19 @@ This is to be called at the end of anything that changes displayed information."
   (if (get-buffer-window "GameMaster")
       (egme-dashboard)))
 
+(defun egme-toggle-dash ()
+  "This function will toggle egme dashboard visibilty.
+
+If it is visible it will kill the window, if not it will load it and update it."
+
+  (interactive)
+
+  (if (get-buffer-window "GameMaster")
+      (progn
+	(delete-window (get-buffer-window "GameMaster"))
+	(kill-buffer "GameMaster"))
+    (egme-dashboard)))
+
 (define-prefix-command 'egme-map)
 (define-key mode-specific-map (kbd "C-g") 'egme-map)
 (define-key egme-map (kbd "r") 'egme-roll-dice)
@@ -810,4 +833,4 @@ This is to be called at the end of anything that changes displayed information."
 (define-key egme-map (kbd "N") 'egme-delete-npc)
 (define-key egme-map (kbd "t") 'egme-add-thread)
 (define-key egme-map (kbd "T") 'egme-delete-thread)
-(define-key egme-map (kbd "d") 'egme-dashboard)
+(define-key egme-map (kbd "d") 'egme-toggle-dash)

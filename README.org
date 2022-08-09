@@ -200,8 +200,8 @@ The entire system is developed from a pen & paper system based on actual dice ro
 The following items are currently on the TODO list - I am open to further suggestions of how this can be improved.
 
 - Show keybinds in dashboard
-- Rework dashboard function, so that it toggles the info buffer
-- More game-state info in the dashboard?
+- [DONE] +Rework dashboard function, so that it toggles the info buffer+ Added a toggle function and bound that key
+- More game-state info in the dashboard? +Dice rolls DONE+
 - [DONE] +Add user customization for random event occurrences+
 - Add random events for new NPC/thread, which also prompts user to update the list
 - Add a random image oracle for extra inspiration (from a user-specified directory)
