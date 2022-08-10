@@ -773,7 +773,7 @@ The Thread list is parsed, and all are offered as options with ido-completing-re
         (if (not egme-thread-list)
 
             ;; Output when no list found
-            (insert "No Threads at present")
+            (insert "No Threads at present\n")
 
           ;; Output when Threads found
           (progn
@@ -784,12 +784,12 @@ The Thread list is parsed, and all are offered as options with ido-completing-re
 
               ;; Pop the list, using each item as output followed by newline
               (insert (pop egme-thread-list))
-              (newline))
+              (newline))))
 
 	    
-	    ;; Insert last dice roll info
-	    (insert "\n\nLast Dice Roll\n---\n")
-	    (insert (concat (format "  Roll: %s" egme-current-dice) (format "\nResult: %s" egme-roll-result))))))
+	;; Insert last dice roll info
+	(insert "\n\nLast Dice Roll\n---\n")
+	(insert (concat (format "  Roll: %s" egme-current-dice) (format "\nResult: %s" egme-roll-result))))
 
       ;; Switch to the new window, temporarily alow horizontal changes, and shrink it to fit the contents
       (other-window 1)
