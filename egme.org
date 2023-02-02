@@ -236,6 +236,14 @@ The below sets a list to be used for the dice roll function's history.
 (setq egme-dice-history (list))
 #+END_SRC
 
+*** Dice Variables
+
+Below will initialize dice-roll variables
+
+#+BEGIN_SRC emacs-lisp
+(setq egme-current-dice nil)
+(setq egme-roll-result nil)
+#+END_SRC
 
 *** Probability List
 
