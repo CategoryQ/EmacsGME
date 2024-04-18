@@ -2,7 +2,7 @@
 
 * EmacsGME - Emacs GameMaster Emulator
 
-EmacsGME v0.2
+EmacsGME v0.3
 
 
 * Introduction
@@ -191,6 +191,7 @@ The entire system is developed from a pen & paper system based on actual dice ro
 
 * Changelog
 
+- v0.3 - Added additional oracles from ~ykgoon~ 
 - v0.2 - Added list handling and dashboard for basic game-state display
 - v0.1 - Initial release
 
@@ -202,6 +203,7 @@ The following items are currently on the TODO list - I am open to further sugges
 - Show keybinds in dashboard
 - [DONE] +Rework dashboard function, so that it toggles the info buffer+ Added a toggle function and bound that key
 - More game-state info in the dashboard? +Dice rolls DONE+
+- Tidy up added oracles from ~ykgoon~
 - [DONE] +Add user customization for random event occurrences+
 - Add random events for new NPC/thread, which also prompts user to update the list
 - Add a random image oracle for extra inspiration (from a user-specified directory)
