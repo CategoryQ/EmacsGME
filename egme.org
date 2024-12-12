@@ -568,8 +568,6 @@ A pair of functions for opening or closing the NPC/Thread list drawers. Open wil
 
 Open state is determined by checking if current line is a drawer, and if the text at the end of the line is visible. If it is invisible, open the drawer with org-cycle."
 
-  (interactive)
-
   (if (and (org-at-drawer-p) (invisible-p (point-at-eol)))
       (org-cycle)
     (message "No closed drawer to open.")))
@@ -583,8 +581,6 @@ Open state is determined by checking if current line is a drawer, and if the tex
 
 Open state is determined by checking if current line is a drawer, and if the text at the end of the line is visible. If it is not invisible, close the drawer with org-cycle."
 
-  (interactive)
-  
   (if (and (org-at-drawer-p) (not (invisible-p (point-at-eol))))
       (org-cycle)
     (message "No open drawer to close")))
